@@ -730,7 +730,7 @@ export class EventExtractor {
           } else if (match[0].toLowerCase().includes('billion')) {
             amount += '000000000';
           }
-          return ' + amount;
+          return '$' + amount;
         }
       }
       
