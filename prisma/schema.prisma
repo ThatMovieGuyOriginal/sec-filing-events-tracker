@@ -1,1 +1,63 @@
 
+  subscriptionTier String?       @default("free")
+  subscriptionEnd  DateTime?
+  stripeCustomerId String?
+  paymentMethods   PaymentMethod[]
+  subscriptions    Subscription[]
+  transactions     Transaction[]
+}
+
+// New models for subscription system
+model Subscription {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier         String    // 'basic', 'pro', 'enterprise'
+  price        Float
+  status       String    // 'active', 'canceled', 'expired'
+  startDate    DateTime  @default(now())
+  endDate      DateTime?
+  canceledAt   DateTime?
+  renewalDate  DateTime?
+  interval     String    // 'monthly', 'annual'
+  stripeSubscriptionId String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([tier])
+  @@index([status])
+}
+
+model PaymentMethod {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         String    // 'card', 'paypal', etc.
+  cardBrand    String?
+  cardLast4    String?
+  expMonth     Int?
+  expYear      Int?
+  stripePaymentMethodId String?
+  isDefault    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Transaction {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Float
+  currency     String    @default("USD")
+  status       String    // 'completed', 'failed', 'refunded'
+  description  String?
+  stripePaymentIntentId String?
+  subscriptionId String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([status])
+}
