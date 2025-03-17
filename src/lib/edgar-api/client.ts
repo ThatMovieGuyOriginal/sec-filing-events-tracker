@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { throttleAdapterEnhancer } from 'axios-extensions';
 import { parseXML } from '../utils/xml-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Configuration options for the SEC EDGAR API client
@@ -20,6 +20,14 @@ export interface EdgarApiConfig {
    * Base URL for SEC EDGAR API
    */
   baseUrl: string;
+  /**
+   * Maximum number of retries for failed requests
+   */
+  maxRetries: number;
+  /**
+   * Delay between retries in ms (increases exponentially)
+   */
+  retryDelay: number;
 }
 
 /**
@@ -111,6 +119,8 @@ export class EdgarApiClient {
     this.config = {
       baseUrl: 'https://www.sec.gov/Archives/edgar',
       rateLimit: 5,
+      maxRetries: 3,
+      retryDelay: 1000,
       ...config,
     };
 
@@ -124,6 +134,37 @@ export class EdgarApiClient {
         threshold: 1000 / this.config.rateLimit,
       }),
     });
+
+    // Add response interceptor for error handling
+    this.client.interceptors.response.use(
+      response => response,
+      async error => {
+        const { config } = error;
+        
+        // Retry logic for specific error codes
+        if (error.response && (error.response.status === 429 || error.response.status >= 500)) {
+          // Set the retry count
+          config.__retryCount = config.__retryCount || 0;
+          
+          // Check if we've maxed out retries
+          if (config.__retryCount < this.config.maxRetries) {
+            // Increase retry count
+            config.__retryCount += 1;
+            
+            // Calculate exponential backoff delay
+            const delay = this.config.retryDelay * Math.pow(2, config.__retryCount - 1);
+            
+            logger.warn(`SEC API rate limit exceeded. Retrying in ${delay}ms (attempt ${config.__retryCount}/${this.config.maxRetries})`);
+            
+            // Delay and retry
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return this.client(config);
+          }
+        }
+        
+        throw error;
+      }
+    );
   }
 
   /**
@@ -263,9 +304,11 @@ export class EdgarApiClient {
 // Export a factory function to create the client with proper configuration
 export const createEdgarClient = (config: Partial<EdgarApiConfig> = {}): EdgarApiClient => {
   return new EdgarApiClient({
-    userAgent: 'example@example.com', // Replace with actual email in production
+    userAgent: process.env.SEC_API_EMAIL || 'example@example.com',
     rateLimit: 2, // Conservative rate limit
     baseUrl: 'https://www.sec.gov/Archives/edgar',
+    maxRetries: 3,
+    retryDelay: 1000,
     ...config,
   });
 };
