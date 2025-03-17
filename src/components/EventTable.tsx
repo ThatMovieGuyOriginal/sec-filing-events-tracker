@@ -60,6 +60,16 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
     debtReduction: 'Debt Reduction',
   };
 
+  // Determine status class
+  const getStatusClass = (status: string): string => {
+    if (status === 'completed') {
+      return 'bg-green-100 text-green-800';
+    } else if (status === 'pending') {
+      return 'bg-yellow-100 text-yellow-800';
+    }
+    return 'bg-gray-100 text-gray-800';
+  };
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="overflow-x-auto">
@@ -144,13 +154,7 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      event.status === 'completed'
-                        ? 'bg-green-100 text-green-800'
-                        : event.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
+                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(event.status)}`}
                   >
                     {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
                   </span>
@@ -183,4 +187,3 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
       )}
     </div>
   );
-};
