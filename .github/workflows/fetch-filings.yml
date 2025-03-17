@@ -1,1 +1,39 @@
+// .github/workflows/fetch-filings.yml
+name: Daily SEC Filings Fetch
 
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  fetch-filings:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run filing fetcher
+        run: node scripts/fetch-filings.js
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SEC_API_EMAIL: ${{ secrets.SEC_API_EMAIL }}
+      
+      - name: Commit and push if there are changes
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add data/
+          git commit -m "Update filing data [skip ci]" || echo "No changes to commit"
+          git push
