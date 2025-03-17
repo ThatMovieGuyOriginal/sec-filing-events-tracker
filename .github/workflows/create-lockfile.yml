@@ -1,0 +1,28 @@
+name: Create Package Lock File
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-lockfile:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Commit package-lock.json
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add package-lock.json
+          git commit -m "Add package-lock.json for deployment"
+          git push
