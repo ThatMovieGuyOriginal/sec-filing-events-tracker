@@ -46,15 +46,15 @@ model Event {
 
 // Company model for storing company information
 model Company {
-  cik         String    @id
+  cik         String      @id
   name        String
   tickers     String[]
   industry    String?
   sector      String?
   description String?
   website     String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   watchlists  Watchlist[]
 
   @@index([name])
@@ -62,14 +62,22 @@ model Company {
 
 // User model for authentication
 model User {
-  id          String     @id @default(uuid())
-  email       String     @unique
-  name        String?
-  password    String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  watchlists  Watchlist[]
-  alerts      Alert[]
+  id                String         @id @default(uuid())
+  email             String         @unique
+  name              String?
+  password          String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  watchlists        Watchlist[]
+  alerts            Alert[]
+  subscriptionTier  String?        @default("free")
+  subscriptionEnd   DateTime?
+  stripeCustomerId  String?
+  paymentMethods    PaymentMethod[]
+  subscriptions     Subscription[]
+  transactions      Transaction[]
+  resetToken        String?
+  resetTokenExpiry  DateTime?
 
   @@index([email])
 }
@@ -105,36 +113,22 @@ model Alert {
   @@index([ticker])
 }
 
-
-
-
-
-
-
-  subscriptionTier String?       @default("free")
-  subscriptionEnd  DateTime?
-  stripeCustomerId String?
-  paymentMethods   PaymentMethod[]
-  subscriptions    Subscription[]
-  transactions     Transaction[]
-}
-
-// New models for subscription system
+// Subscription model for premium features
 model Subscription {
-  id           String    @id @default(uuid())
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tier         String    // 'basic', 'pro', 'enterprise'
-  price        Float
-  status       String    // 'active', 'canceled', 'expired'
-  startDate    DateTime  @default(now())
-  endDate      DateTime?
-  canceledAt   DateTime?
-  renewalDate  DateTime?
-  interval     String    // 'monthly', 'annual'
+  id                  String    @id @default(uuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier                String    // 'basic', 'pro', 'enterprise'
+  price               Float
+  status              String    // 'active', 'canceled', 'expired'
+  startDate           DateTime  @default(now())
+  endDate             DateTime?
+  canceledAt          DateTime?
+  renewalDate         DateTime?
+  interval            String    // 'monthly', 'annual'
   stripeSubscriptionId String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@index([userId])
   @@index([tier])
@@ -142,33 +136,33 @@ model Subscription {
 }
 
 model PaymentMethod {
-  id           String    @id @default(uuid())
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type         String    // 'card', 'paypal', etc.
-  cardBrand    String?
-  cardLast4    String?
-  expMonth     Int?
-  expYear      Int?
+  id                    String    @id @default(uuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type                  String    // 'card', 'paypal', etc.
+  cardBrand             String?
+  cardLast4             String?
+  expMonth              Int?
+  expYear               Int?
   stripePaymentMethodId String?
-  isDefault    Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  isDefault             Boolean   @default(false)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@index([userId])
 }
 
 model Transaction {
-  id           String    @id @default(uuid())
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount       Float
-  currency     String    @default("USD")
-  status       String    // 'completed', 'failed', 'refunded'
-  description  String?
-  stripePaymentIntentId String?
-  subscriptionId String?
-  createdAt    DateTime  @default(now())
+  id                     String    @id @default(uuid())
+  userId                 String
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount                 Float
+  currency               String    @default("USD")
+  status                 String    // 'completed', 'failed', 'refunded'
+  description            String?
+  stripePaymentIntentId  String?
+  subscriptionId         String?
+  createdAt              DateTime  @default(now())
 
   @@index([userId])
   @@index([status])
