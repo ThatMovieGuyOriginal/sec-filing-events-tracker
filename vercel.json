@@ -1,17 +1,16 @@
-// vercel.json
 {
   "name": "sec-filing-events-tracker",
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
   "env": {
     "DATABASE_URL": "@database_url",
     "JWT_SECRET": "@jwt_secret",
     "SEC_API_EMAIL": "@sec_api_email"
   },
-  "regions": ["iad1"]
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024
+    }
+  }
 }
