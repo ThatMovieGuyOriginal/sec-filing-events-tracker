@@ -2,6 +2,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../database';
 import { verify } from 'jsonwebtoken';
+import logger from '../utils/logger';
 
 /**
  * Extended request with user information
@@ -37,8 +38,14 @@ export function withAuth(
         return res.status(401).json({ message: 'Authentication required' });
       }
 
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        logger.error('JWT_SECRET environment variable is not set');
+        return res.status(500).json({ message: 'Server configuration error' });
+      }
+
       // Verify token
-      const decoded = verify(token, process.env.JWT_SECRET!) as { id: string };
+      const decoded = verify(token, jwtSecret) as { id: string };
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
         select: { id: true, email: true },
@@ -54,7 +61,14 @@ export function withAuth(
       // Continue to handler
       return handler(req as AuthenticatedRequest, res);
     } catch (error) {
-      return res.status(401).json({ message: 'Invalid or expired token' });
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ message: 'Invalid token' });
+      } else if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired' });
+      }
+      
+      logger.error('Authentication error:', error);
+      return res.status(401).json({ message: 'Authentication failed' });
     }
   };
 }
