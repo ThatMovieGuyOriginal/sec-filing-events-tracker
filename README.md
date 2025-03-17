@@ -1,4 +1,4 @@
-# SEC Filing Events Tracker2
+# SEC Filing Events Tracker
 
 A comprehensive application that monitors SEC EDGAR filings, extracts key events, and provides a calendar-based visualization for tracking corporate events like ticker changes, insider buying, share buybacks, and more.
 
