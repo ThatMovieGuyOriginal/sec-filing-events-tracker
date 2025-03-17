@@ -1,1 +1,106 @@
+// src/lib/database/schema.prisma
+/**
+ * This file defines the database schema using Prisma
+ * 
+ * To generate the Prisma client:
+ * npx prisma generate
+ * 
+ * To run migrations:
+ * npx prisma migrate dev
+ */
 
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Event model representing SEC filing events
+model Event {
+  id                    String   @id
+  type                  String
+  cik                   String
+  companyName           String
+  ticker                String?
+  identifiedDate        DateTime
+  executionDate         DateTime?
+  sourceFormType        String
+  sourceAccessionNumber String
+  sourceUrl             String?
+  description           String
+  details               Json
+  status                String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([cik])
+  @@index([ticker])
+  @@index([type])
+  @@index([identifiedDate])
+  @@index([executionDate])
+  @@index([status])
+}
+
+// Company model for storing company information
+model Company {
+  cik         String    @id
+  name        String
+  tickers     String[]
+  industry    String?
+  sector      String?
+  description String?
+  website     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  watchlists  Watchlist[]
+
+  @@index([name])
+}
+
+// User model for authentication
+model User {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  name        String?
+  password    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  watchlists  Watchlist[]
+  alerts      Alert[]
+
+  @@index([email])
+}
+
+// Watchlist model for user-created watchlists
+model Watchlist {
+  id          String     @id @default(uuid())
+  name        String
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companies   Company[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+// Alert model for user notifications
+model Alert {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType   String?
+  cik         String?
+  ticker      String?
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([cik])
+  @@index([ticker])
+}
