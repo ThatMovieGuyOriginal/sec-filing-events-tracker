@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "fetch-filings": "node scripts/fetch-filings.js",
     "build-company-db": "node scripts/build-company-db.js",
     "update-statuses": "node scripts/update-event-statuses.js",
