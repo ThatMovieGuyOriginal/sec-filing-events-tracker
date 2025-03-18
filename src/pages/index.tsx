@@ -5,7 +5,6 @@ import { CalendarView } from '../components/CalendarView';
 import { EventTable } from '../components/EventTable';
 import { CompanySearch } from '../components/CompanySearch';
 import { EventFilter } from '../components/EventFilter';
-import { Sidebar } from '../components/Sidebar';
 import { EventData } from '../lib/events/event-extractor';
 import { fetchUpcomingEvents, searchCompany } from '../lib/api/client';
 import { Layout } from '../components/Layout';
@@ -67,64 +66,6 @@ export default function Home() {
   const filteredEvents = filters.length > 0
     ? events.filter(event => filters.includes(event.type))
     : events;
-
-  return (
-    <div className="flex h-screen bg-gray-50">
-      <Head>
-        <title>SEC Filing Events Tracker</title>
-        <meta name="description" content="Track important SEC filing events" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <Sidebar />
-
-      <main className="flex-1 overflow-auto">
-        <div className="px-6 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">SEC Filing Events</h1>
-            <div className="flex space-x-4">
-              <button
-                className={`px-4 py-2 rounded-md ${view === 'calendar' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-                onClick={() => setView('calendar')}
-              >
-                Calendar
-              </button>
-              <button
-                className={`px-4 py-2 rounded-md ${view === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-                onClick={() => setView('table')}
-              >
-                Table
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <CompanySearch onSearch={handleSearch} />
-                <EventFilter onFilterChange={handleFilterChange} />
-              </div>
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-          ) : (
-            <>
-              {view === 'calendar' ? (
-                <CalendarView events={filteredEvents} />
-              ) : (
-                <EventTable events={filteredEvents} />
-              )}
-            </>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-}
 
   return (
     <Layout title="Dashboard">
