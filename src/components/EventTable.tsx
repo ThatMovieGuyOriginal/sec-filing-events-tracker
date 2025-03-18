@@ -12,8 +12,10 @@ const readCSVFile = async (filename: string) => {
   try {
     // Read file as arrayBuffer
     const response = await window.fs.readFile(filename);
-    // Convert to text
-    const text = new TextDecoder().decode(response);
+    // Convert to text - handle both string and Uint8Array return types
+    const text = typeof response === 'string' 
+      ? response 
+      : new TextDecoder().decode(response);
     
     return new Promise((resolve, reject) => {
       Papa.parse(text, {
