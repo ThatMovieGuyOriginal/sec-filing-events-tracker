@@ -1,6 +1,4 @@
 // src/lib/utils/window-fs.ts
-
-// Extend Window interface to include our fs utility
 declare global {
   interface Window {
     fs: {
@@ -48,13 +46,13 @@ export const initWindowFs = () => {
           '2023-05-15,165000,90000,75000\n' +
           '2023-06-15,175000,95000,80000\n';
         
-        const encoder = new TextEncoder();
-        const data = encoder.encode(csvData);
-        fileStore[path] = data;
-        
         if (options?.encoding === 'utf8') {
           return csvData;
         }
+        
+        const encoder = new TextEncoder();
+        const data = encoder.encode(csvData);
+        fileStore[path] = data;
         return data;
       }
       
