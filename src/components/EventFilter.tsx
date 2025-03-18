@@ -30,7 +30,7 @@ export const EventFilter: React.FC<EventFilterProps> = ({ onFilterChange }) => {
   ];
 
   // Toggle filter selection
-  const toggleFilter = (filter: string) => {
+  const toggleFilter = (filter: string): void => {
     const newFilters = selectedFilters.includes(filter)
       ? selectedFilters.filter(f => f !== filter)
       : [...selectedFilters, filter];
