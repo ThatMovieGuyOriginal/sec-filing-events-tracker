@@ -1,5 +1,5 @@
 // src/lib/parsers/base-parser.ts
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Base filing data structure
