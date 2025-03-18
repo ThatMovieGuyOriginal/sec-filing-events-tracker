@@ -18,7 +18,7 @@ export const AccountSection = ({ userData }: { userData: any }) => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const router = useRouter();
 
-  const handlePasswordChange = (e) => {
+const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword({
       ...password,
       [e.target.name]: e.target.value
