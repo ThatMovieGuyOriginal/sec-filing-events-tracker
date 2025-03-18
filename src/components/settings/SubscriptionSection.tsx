@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-export const SubscriptionSection = ({ userData }) => {
+export const SubscriptionSection = ({ userData }: { userData: any }) => {
   const router = useRouter();
   const subscription = userData?.activeSubscription;
   const subscriptionTier = userData?.subscriptionTier || 'free';
