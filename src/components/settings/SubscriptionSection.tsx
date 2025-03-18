@@ -15,14 +15,14 @@ export const SubscriptionSection = ({ userData }: { userData: any }) => {
       })
     : null;
 
-const formatDate = (dateString: string | null | undefined): string => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  const formatDate = (dateString: string | null | undefined): string => {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    };
 
   const handleUpgrade = () => {
     router.push('/pricing');
