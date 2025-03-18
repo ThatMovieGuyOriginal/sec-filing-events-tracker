@@ -11,29 +11,29 @@ export const ProfileSection = ({ userData }: { userData: any }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setMessage({ type: '', text: '' });
-
-    try {
-      await axios.put('/api/user/profile', {
-        name,
-        email,
-        company,
-        jobTitle,
-        bio,
-      });
-      setMessage({ type: 'success', text: 'Profile updated successfully' });
-    } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to update profile' 
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setMessage({ type: '', text: '' });
+  
+      try {
+        await axios.put('/api/user/profile', {
+          name,
+          email,
+          company,
+          jobTitle,
+          bio,
+        });
+        setMessage({ type: 'success', text: 'Profile updated successfully' });
+      } catch (error: any) {
+        setMessage({ 
+          type: 'error', 
+          text: error.response?.data?.message || 'Failed to update profile' 
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   return (
     <div>
