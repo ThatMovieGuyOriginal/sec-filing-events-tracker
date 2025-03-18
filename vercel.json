@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "functions": {
-    "api/**/*.js": {
+    "src/pages/api/**/*.ts": {
       "memory": 1024
     }
   }
