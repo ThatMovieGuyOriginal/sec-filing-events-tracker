@@ -1,6 +1,6 @@
 // src/lib/events/event-extractor.ts
 import { FilingData } from '../parsers/base-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Base event data structure
