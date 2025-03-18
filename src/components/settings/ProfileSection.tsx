@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-export const ProfileSection = ({ userData }) => {
+export const ProfileSection = ({ userData }: { userData: any }) => {
   const [name, setName] = useState(userData?.name || '');
   const [email, setEmail] = useState(userData?.email || '');
   const [company, setCompany] = useState(userData?.company || '');
