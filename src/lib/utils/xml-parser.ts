@@ -12,9 +12,9 @@ export function parseXML(xmlString: string): Document | null {
     // Configure xmldom parser with custom error handlers
     const parser = new DOMParser({
       errorHandler: {
-        warning: (msg) => logger.warn(`XML Parser warning: ${msg}`),
-        error: (msg) => logger.error(`XML Parser error: ${msg}`),
-        fatalError: (msg) => {
+        warning: (msg: string) => logger.warn(`XML Parser warning: ${msg}`),
+        error: (msg: string) => logger.error(`XML Parser error: ${msg}`),
+        fatalError: (msg: string) => {
           logger.error(`XML Parser fatal error: ${msg}`);
           throw new Error(`Fatal XML parsing error: ${msg}`);
         }
