@@ -11,7 +11,7 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Checkout form component
-const CheckoutForm = ({ planId, billingInterval }) => {
+const CheckoutForm = ({ planId, billingInterval }: { planId: string, billingInterval: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState('');
