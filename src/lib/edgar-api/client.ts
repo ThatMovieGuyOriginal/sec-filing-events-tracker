@@ -1,5 +1,5 @@
 // src/lib/edgar-api/client.ts
-import axios from 'axios';
+import axios, { AxiosAdapter } from 'axios';
 import { throttleAdapterEnhancer } from 'axios-extensions';
 import { parseXML } from '../utils/xml-parser';
 import logger from '../utils/logger';
@@ -125,12 +125,14 @@ export class EdgarApiClient {
     };
 
     // Create axios instance with rate limiting to avoid SEC blocks
+    const axiosAdapter = axios.defaults.adapter as AxiosAdapter;
+    
     this.client = axios.create({
       baseURL: this.config.baseUrl,
       headers: {
         'User-Agent': this.config.userAgent,
       },
-      adapter: throttleAdapterEnhancer(axios.defaults.adapter!, {
+      adapter: throttleAdapterEnhancer(axiosAdapter, {
         threshold: 1000 / this.config.rateLimit,
       }),
     });
