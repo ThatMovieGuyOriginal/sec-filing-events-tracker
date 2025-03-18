@@ -1,6 +1,6 @@
 // src/lib/parsers/form13d-parser.ts
 import { BaseParser, FilingData } from './base-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Parser for Schedule 13D filings (institutional ownership)
