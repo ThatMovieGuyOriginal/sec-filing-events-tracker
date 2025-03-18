@@ -1,7 +1,7 @@
 // src/lib/database/index.ts
 import { PrismaClient } from '@prisma/client';
 import { EventData } from '../events/event-extractor';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 // Create a singleton Prisma client instance
 const prisma = new PrismaClient();
