@@ -274,32 +274,38 @@ export class EdgarApiClient {
     }
   }
 
-  /**
-   * Get CIK by ticker symbol
-   * @param ticker Ticker symbol of the company
-   * @returns Promise resolving to CIK number
-   */
-  async getCIKByTicker(ticker: string): Promise<string | null> {
-    try {
-      logger.info(`Looking up CIK for ticker: ${ticker}`);
-      
-      // SEC provides a ticker to CIK mapping
-      const response = await this.client.get('https://www.sec.gov/files/company_tickers.json');
-      
-      const tickerMapping = Object.values(response.data);
-      const match = tickerMapping.find((entry: any) => 
-        entry.ticker.toLowerCase() === ticker.toLowerCase()
-      );
-      
-      if (match) {
-        return match.cik_str.toString();
-      }
-      
-      return null;
-    } catch (error) {
-      logger.error(`Error looking up CIK for ticker ${ticker}:`, error);
-      return null;
+/**
+ * Get CIK by ticker symbol
+ * @param ticker Ticker symbol of the company
+ * @returns Promise resolving to CIK number
+ */
+async getCIKByTicker(ticker: string): Promise<string | null> {
+  try {
+    logger.info(`Looking up CIK for ticker: ${ticker}`);
+    
+    // SEC provides a ticker to CIK mapping
+    const response = await this.client.get('https://www.sec.gov/files/company_tickers.json');
+    
+    // Define a type for the mapping entries
+    type TickerMappingEntry = {
+      ticker: string;
+      cik_str: string;
+    };
+
+    // Cast the ticker mapping to the expected type
+    const tickerMapping = Object.values(response.data) as TickerMappingEntry[];
+    const match = tickerMapping.find(entry => 
+      entry.ticker.toLowerCase() === ticker.toLowerCase()
+    );
+    
+    if (match) {
+      return match.cik_str.toString();
     }
+    
+    return null;
+  } catch (error) {
+    logger.error(`Error looking up CIK for ticker ${ticker}:`, error);
+    return null;
   }
 }
 
