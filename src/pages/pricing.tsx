@@ -67,9 +67,9 @@ export default function Pricing() {
   ];
 
   // Calculate savings for annual billing
-  const calculateSavings = (plan) => {
-    const monthlyPrice = parseInt(plan.price.monthly.replace(', ''));
-    const annualPrice = parseInt(plan.price.annual.replace(', ''));
+  const calculateSavings = (plan: any): number => {
+    const monthlyPrice = parseInt(plan.price.monthly.replace('$', '').replace(',', ''));
+    const annualPrice = parseInt(plan.price.annual.replace('$', '').replace(',', ''));
     const annualAsMonthly = annualPrice / 12;
     const savings = monthlyPrice - annualAsMonthly;
     const savingsPercentage = Math.round((savings / monthlyPrice) * 100);
