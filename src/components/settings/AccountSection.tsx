@@ -3,6 +3,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 
+interface AccountSectionProps {
+  userData: any; // Replace 'any' with a more specific type if available
+}
+
 export const AccountSection = ({ userData }) => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [password, setPassword] = useState({
