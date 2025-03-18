@@ -187,3 +187,4 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
       )}
     </div>
   );
+}
