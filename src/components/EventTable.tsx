@@ -25,7 +25,7 @@ const readCSVFile = async (filename: string) => {
         complete: (results) => {
           resolve(results.data);
         },
-        error: (error) => {
+        error: (error: any) => {
           reject(error);
         }
       });
