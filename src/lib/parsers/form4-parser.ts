@@ -1,6 +1,6 @@
 // src/lib/parsers/form4-parser.ts
 import { BaseParser, FilingData } from './base-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Parser for Form 4 (insider trading) filings
