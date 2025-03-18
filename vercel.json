@@ -3,11 +3,6 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "JWT_SECRET": "@jwt_secret",
-    "SEC_API_EMAIL": "@sec_api_email"
-  },
   "functions": {
     "api/**/*.js": {
       "memory": 1024
