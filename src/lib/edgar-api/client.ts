@@ -260,8 +260,8 @@ export class EdgarApiClient {
   }
 
   /**
-   * Get ticker information by company name
-   * @param companyName Name or partial name of the company
+   * Get ticker information by CIK
+   * @param cik Central Index Key for the company
    * @returns Promise resolving to ticker information
    */
   async getTickerByCIK(cik: string): Promise<string | null> {
@@ -274,38 +274,39 @@ export class EdgarApiClient {
     }
   }
 
-/**
- * Get CIK by ticker symbol
- * @param ticker Ticker symbol of the company
- * @returns Promise resolving to CIK number
- */
-async getCIKByTicker(ticker: string): Promise<string | null> {
-  try {
-    logger.info(`Looking up CIK for ticker: ${ticker}`);
-    
-    // SEC provides a ticker to CIK mapping
-    const response = await this.client.get('https://www.sec.gov/files/company_tickers.json');
-    
-    // Define a type for the mapping entries
-    type TickerMappingEntry = {
-      ticker: string;
-      cik_str: string;
-    };
+  /**
+   * Get CIK by ticker symbol
+   * @param ticker Ticker symbol of the company
+   * @returns Promise resolving to CIK number
+   */
+  async getCIKByTicker(ticker: string): Promise<string | null> {
+    try {
+      logger.info(`Looking up CIK for ticker: ${ticker}`);
+      
+      // SEC provides a ticker to CIK mapping
+      const response = await this.client.get('https://www.sec.gov/files/company_tickers.json');
+      
+      // Define a type for the mapping entries
+      type TickerMappingEntry = {
+        ticker: string;
+        cik_str: string;
+      };
 
-    // Cast the ticker mapping to the expected type
-    const tickerMapping = Object.values(response.data) as TickerMappingEntry[];
-    const match = tickerMapping.find(entry => 
-      entry.ticker.toLowerCase() === ticker.toLowerCase()
-    );
-    
-    if (match) {
-      return match.cik_str.toString();
+      // Cast the ticker mapping to the expected type
+      const tickerMapping = Object.values(response.data) as TickerMappingEntry[];
+      const match = tickerMapping.find(entry => 
+        entry.ticker.toLowerCase() === ticker.toLowerCase()
+      );
+      
+      if (match) {
+        return match.cik_str.toString();
+      }
+      
+      return null;
+    } catch (error) {
+      logger.error(`Error looking up CIK for ticker ${ticker}:`, error);
+      return null;
     }
-    
-    return null;
-  } catch (error) {
-    logger.error(`Error looking up CIK for ticker ${ticker}:`, error);
-    return null;
   }
 }
 
