@@ -1,6 +1,6 @@
 // src/lib/parsers/form14a-parser.ts
 import { BaseParser, FilingData } from './base-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Parser for Form 14A (proxy statement) filings
