@@ -7,7 +7,7 @@ interface AccountSectionProps {
   userData: any; // Replace 'any' with a more specific type if available
 }
 
-export const AccountSection = ({ userData }) => {
+export const AccountSection = ({ userData }: { userData: any }) => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [password, setPassword] = useState({
     current: '',
