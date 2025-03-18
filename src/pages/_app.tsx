@@ -3,8 +3,17 @@ import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { AdProvider } from '../contexts/AdContext';
 import Script from 'next/script';
+import { useEffect } from 'react';
+import initWindowFs from '../lib/utils/window-fs';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  // Initialize window.fs utility
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initWindowFs();
+    }
+  }, []);
+
   return (
     <AdProvider>
       {/* Google Analytics script - replace with your GA ID */}
