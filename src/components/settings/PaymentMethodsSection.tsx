@@ -26,7 +26,7 @@ export const PaymentMethodsSection = ({ userData }: { userData: any }) => {
     }
   };
 
-  const handleDeletePaymentMethod = async (id) => {
+  const handleDeletePaymentMethod = async (id: string) => {
     if (!confirm('Are you sure you want to remove this payment method?')) {
       return;
     }
@@ -36,7 +36,7 @@ export const PaymentMethodsSection = ({ userData }: { userData: any }) => {
       await axios.delete(`/api/user/payment-methods/${id}`);
       setMessage({ type: 'success', text: 'Payment method removed successfully' });
       fetchPaymentMethods();
-    } catch (error) {
+    } catch (error: any) {
       setMessage({ 
         type: 'error', 
         text: error.response?.data?.message || 'Failed to remove payment method' 
@@ -46,13 +46,13 @@ export const PaymentMethodsSection = ({ userData }: { userData: any }) => {
     }
   };
 
-  const handleSetDefault = async (id) => {
+  const handleSetDefault = async (id: string) => {
     setIsLoading(true);
     try {
       await axios.post(`/api/user/payment-methods/${id}/set-default`);
       setMessage({ type: 'success', text: 'Default payment method updated' });
       fetchPaymentMethods();
-    } catch (error) {
+    } catch (error: any) {
       setMessage({ 
         type: 'error', 
         text: error.response?.data?.message || 'Failed to update default payment method' 
