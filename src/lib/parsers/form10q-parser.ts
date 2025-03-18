@@ -1,6 +1,6 @@
 // src/lib/parsers/form10q-parser.ts
 import { BaseParser, FilingData } from './base-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Parser for Form 10-Q filings with focus on buybacks
