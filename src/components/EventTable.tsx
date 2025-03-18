@@ -8,33 +8,33 @@ interface EventTableProps {
   events: EventData[];
 }
 
-const readCSVFile = async (filename: string): Promise<any[]> => {
-  try {
-    // Read file as arrayBuffer
-    const response = await window.fs.readFile(filename);
-    // Convert to text - handle both string and Uint8Array return types
-    const text = typeof response === 'string' 
-      ? response 
-      : new TextDecoder().decode(response);
-    
-    return new Promise((resolve, reject) => {
-      Papa.parse(text, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          resolve(results.data);
-        },
-        error: (error: any) => {
-          reject(error);
-        }
+  const readCSVFile = async (filename: string): Promise<any[]> => {
+    try {
+      // Read file as arrayBuffer
+      const response = await window.fs.readFile(filename);
+      // Convert to text - handle both string and Uint8Array return types
+      const text = typeof response === 'string' 
+        ? response 
+        : new TextDecoder().decode(response);
+      
+      return new Promise((resolve, reject) => {
+        Papa.parse(text, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            resolve(results.data);
+          },
+          error: (error: any) => {
+            reject(error);
+          }
+        });
       });
-    });
-  } catch (error) {
-    console.error(`Error reading CSV file ${filename}:`, error);
-    throw error;
-  }
-};
+    } catch (error: any) {
+      console.error(`Error reading CSV file ${filename}:`, error);
+      throw error;
+    }
+  };
 
 /**
  * Table view for displaying upcoming events
