@@ -44,29 +44,32 @@ export function withAuth(
         return res.status(500).json({ message: 'Server configuration error' });
       }
 
-      // Verify token
-      const decoded = verify(token, jwtSecret) as { id: string };
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.id },
-        select: { id: true, email: true },
-      });
+      try {
+        // Verify token
+        const decoded = verify(token, jwtSecret) as { id: string };
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.id },
+          select: { id: true, email: true },
+        });
 
-      if (!user) {
-        return res.status(401).json({ message: 'User not found' });
+        if (!user) {
+          return res.status(401).json({ message: 'User not found' });
+        }
+
+        // Add user to request
+        (req as AuthenticatedRequest).user = user;
+        
+        // Continue to handler
+        return handler(req as AuthenticatedRequest, res);
+      } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+          return res.status(401).json({ message: 'Invalid token' });
+        } else if (error.name === 'TokenExpiredError') {
+          return res.status(401).json({ message: 'Token expired' });
+        }
+        throw error;
       }
-
-      // Add user to request
-      (req as AuthenticatedRequest).user = user;
-      
-      // Continue to handler
-      return handler(req as AuthenticatedRequest, res);
     } catch (error) {
-      if (error.name === 'JsonWebTokenError') {
-        return res.status(401).json({ message: 'Invalid token' });
-      } else if (error.name === 'TokenExpiredError') {
-        return res.status(401).json({ message: 'Token expired' });
-      }
-      
       logger.error('Authentication error:', error);
       return res.status(401).json({ message: 'Authentication failed' });
     }
