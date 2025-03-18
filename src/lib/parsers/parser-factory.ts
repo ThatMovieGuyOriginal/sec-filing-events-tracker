@@ -5,7 +5,7 @@ import { Form4Parser } from './form4-parser';
 import { Form13DParser } from './form13d-parser';
 import { Form10QParser } from './form10q-parser';
 import { Form14AParser } from './form14a-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Factory for creating appropriate parser instances
