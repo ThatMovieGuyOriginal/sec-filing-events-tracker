@@ -1,6 +1,6 @@
 // src/lib/parsers/form8k-parser.ts
 import { BaseParser, FilingData } from './base-parser';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Parser for Form 8-K filings
