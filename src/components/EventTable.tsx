@@ -8,7 +8,7 @@ interface EventTableProps {
   events: EventData[];
 }
 
-const readCSVFile = async (filename) => {
+const readCSVFile = async (filename: string) => {
   try {
     // Read file as arrayBuffer
     const response = await window.fs.readFile(filename);
@@ -214,4 +214,4 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
       )}
     </div>
   );
-}
+};
