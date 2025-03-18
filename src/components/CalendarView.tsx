@@ -39,7 +39,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ events }) => {
   }, [events]);
 
   // Handle event click
-  const handleEventClick = (event: any) => {
+  const handleEventClick = (event: any): void => {
     setSelectedEvent(event.resource);
     setShowModal(true);
   };
