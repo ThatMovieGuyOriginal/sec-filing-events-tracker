@@ -57,8 +57,10 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
 
   // Sort events
   const sortedEvents = [...events].sort((a, b) => {
-    if (a[sortField] < b[sortField]) return sortDirection === 'asc' ? -1 : 1;
-    if (a[sortField] > b[sortField]) return sortDirection === 'asc' ? 1 : -1;
+    const aValue = a[sortField] ?? '';
+    const bValue = b[sortField] ?? '';
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
 
