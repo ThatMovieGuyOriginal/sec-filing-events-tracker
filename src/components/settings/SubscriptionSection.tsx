@@ -15,7 +15,7 @@ export const SubscriptionSection = ({ userData }: { userData: any }) => {
       })
     : null;
 
-  const formatDate = (dateString) => {
+const formatDate = (dateString: string | null | undefined): string => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
