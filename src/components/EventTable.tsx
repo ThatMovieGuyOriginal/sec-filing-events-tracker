@@ -8,7 +8,7 @@ interface EventTableProps {
   events: EventData[];
 }
 
-const readCSVFile = async (filename: string) => {
+const readCSVFile = async (filename: string): Promise<any[]> => {
   try {
     // Read file as arrayBuffer
     const response = await window.fs.readFile(filename);
