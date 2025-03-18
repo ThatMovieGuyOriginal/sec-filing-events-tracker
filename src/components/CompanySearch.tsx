@@ -38,7 +38,7 @@ export const CompanySearch: React.FC<CompanySearchProps> = ({ onSearch }) => {
   };
 
   // Handle suggestion selection
-  const handleSelectSuggestion = (suggestion: any) => {
+  const handleSelectSuggestion = (suggestion: any): void => {
     setSearchTerm(suggestion.ticker || suggestion.name);
     setSuggestions([]);
     setShowSuggestions(false);
