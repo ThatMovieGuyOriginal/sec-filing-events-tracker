@@ -11,7 +11,7 @@ declare global {
 }
 
 // Initialize the window.fs utility
-export const initWindowFs = () => {
+export const initWindowFs = (): void => {
   // In-memory file storage for development/demo purposes
   const fileStore: Record<string, Uint8Array> = {};
 
