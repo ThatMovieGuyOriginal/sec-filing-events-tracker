@@ -2,10 +2,37 @@
 import React, { useState } from 'react';
 import { EventData } from '../lib/events/event-extractor';
 import { EventModal } from './EventModal';
+import Papa from 'papaparse';
 
 interface EventTableProps {
   events: EventData[];
 }
+
+const readCSVFile = async (filename) => {
+  try {
+    // Read file as arrayBuffer
+    const response = await window.fs.readFile(filename);
+    // Convert to text
+    const text = new TextDecoder().decode(response);
+    
+    return new Promise((resolve, reject) => {
+      Papa.parse(text, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          resolve(results.data);
+        },
+        error: (error) => {
+          reject(error);
+        }
+      });
+    });
+  } catch (error) {
+    console.error(`Error reading CSV file ${filename}:`, error);
+    throw error;
+  }
+};
 
 /**
  * Table view for displaying upcoming events
