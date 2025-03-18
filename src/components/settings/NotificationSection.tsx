@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-export const NotificationSection = ({ userData }) => {
+xport const NotificationSection = ({ userData }: { userData: any }) => {
   const [settings, setSettings] = useState({
     emailNotifications: userData?.preferences?.emailNotifications ?? true,
     filingAlerts: userData?.preferences?.filingAlerts ?? true,
