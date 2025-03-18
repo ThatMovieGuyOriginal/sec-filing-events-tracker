@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import axios from 'axios';
 import { EventData } from '../events/event-extractor';
 
-const fetcher = async (url: string) => {
+const fetcher = async (url: string): Promise<EventData[]> => {
   const response = await axios.get(url);
   return response.data;
 };
