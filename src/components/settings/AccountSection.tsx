@@ -25,7 +25,7 @@ export const AccountSection = ({ userData }: { userData: any }) => {
       });
     };
 
-  const handleChangePassword = async (e) => {
+  const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (password.new !== password.confirm) {
