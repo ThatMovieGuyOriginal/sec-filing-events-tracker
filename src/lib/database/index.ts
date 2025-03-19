@@ -261,6 +261,22 @@ export class EventDatabase {
       throw new Error(`Failed to get upcoming events: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+
+  async getUpcomingEventsCount(): Promise<number> {
+    try {
+      const now = new Date();
+      const count = await prisma.event.count({
+        where: {
+          executionDate: { gt: now },
+          status: 'pending',
+        },
+      });
+      return count;
+    } catch (error) {
+      logger.error(`Error counting upcoming events:`, error);
+      throw new Error(`Failed to count upcoming events: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
   
   /**
    * Get events in a date range
