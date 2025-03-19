@@ -1,4 +1,13 @@
 // src/lib/analytics/index.ts
+
+// Augment the global Window interface to include dataLayer and gtag
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
+  }
+}
+
 type EventData = Record<string, any>;
 
 // Analytics interface
@@ -21,7 +30,7 @@ class GoogleAnalytics implements Analytics {
       document.head.appendChild(script);
       
       window.dataLayer = window.dataLayer || [];
-      window.gtag = function() {
+      window.gtag = function () {
         window.dataLayer.push(arguments);
       };
       
@@ -94,3 +103,5 @@ export const useAnalytics = () => {
   
   return analytics;
 };
+
+export {};
