@@ -10,6 +10,8 @@ interface CTAButtonProps {
   trackingId: string;
   trackingData?: Record<string, any>;
   variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'small' | 'medium' | 'large';
+  withArrow?: boolean;
 }
 
 export const CTAButton: React.FC<CTAButtonProps> = ({
@@ -19,8 +21,8 @@ export const CTAButton: React.FC<CTAButtonProps> = ({
   trackingId,
   trackingData = {},
   variant = 'primary',
-  size = 'medium', // Add size prop
-  withArrow = false, // Add arrow indicator option
+  size = 'medium',
+  withArrow = false,
 }) => {
   const getButtonStyles = () => {
     switch (variant) {
@@ -35,6 +37,14 @@ export const CTAButton: React.FC<CTAButtonProps> = ({
     }
   };
 
+  const getSizeStyles = () => {
+    switch (size) {
+      case 'small': return 'px-4 py-2 text-sm';
+      case 'large': return 'px-8 py-4 text-lg';
+      default: return 'px-6 py-3 text-base';
+    }
+  };
+
   const handleClick = () => {
     // Track conversion
     analytics.trackEvent('cta_click', {
@@ -43,27 +53,6 @@ export const CTAButton: React.FC<CTAButtonProps> = ({
       cta_url: href,
       ...trackingData,
     });
-  };
-
-  return (
-    <Link href={href}>
-      <a
-        onClick={handleClick}
-        className={`px-6 py-3 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${getButtonStyles()} ${className}`}
-        data-tracking-id={trackingId}
-      >
-        {text}
-      </a>
-    </Link>
-  );
-};
-
-  const getSizeStyles = () => {
-    switch (size) {
-      case 'small': return 'px-4 py-2 text-sm';
-      case 'large': return 'px-8 py-4 text-lg';
-      default: return 'px-6 py-3 text-base';
-    }
   };
 
   return (
