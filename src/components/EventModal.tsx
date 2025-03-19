@@ -191,3 +191,29 @@ export const EventModal: React.FC<EventModalProps> = ({ event, onClose }) => {
     </div>
   );
 };
+
+  // Create structured data for the event
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BusinessEvent",
+    "name": `${eventTypeNames[event.type] || event.type} - ${event.companyName}`,
+    "description": event.description,
+    "startDate": event.executionDate || event.identifiedDate,
+    "location": {
+      "@type": "VirtualLocation",
+      "url": event.sourceUrl || "https://www.sec.gov/"
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": event.companyName,
+      "identifier": event.cik
+    }
+  };
+  
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      {/* Modal content... */}
+    </>
+  );
+};
