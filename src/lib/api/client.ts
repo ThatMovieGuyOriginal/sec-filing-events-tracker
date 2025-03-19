@@ -10,19 +10,6 @@ const api = axios.create({
 });
 
 /**
- * Fetch upcoming events
- */
-export const fetchUpcomingEvents = async (): Promise<EventData[]> => {
-  try {
-    const response = await api.get('/events/upcoming');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching upcoming events:', error);
-    return [];
-  }
-};
-
-/**
  * Search for a company by ticker or CIK
  */
 export const searchCompany = async (identifier: string): Promise<EventData[]> => {
@@ -41,7 +28,7 @@ export const searchCompany = async (identifier: string): Promise<EventData[]> =>
 export const searchCompanyByName = async (query: string): Promise<any[]> => {
   try {
     const response = await api.get('/companies/search', {
-      params: { query }
+      params: { query },
     });
     return response.data;
   } catch (error) {
@@ -69,7 +56,7 @@ export const getEventsByType = async (type: string): Promise<EventData[]> => {
 export const getEventsByDateRange = async (startDate: string, endDate: string): Promise<EventData[]> => {
   try {
     const response = await api.get('/events/date-range', {
-      params: { startDate, endDate }
+      params: { startDate, endDate },
     });
     return response.data;
   } catch (error) {
@@ -78,11 +65,13 @@ export const getEventsByDateRange = async (startDate: string, endDate: string): 
   }
 };
 
-// Add pagination parameters to API functions
+/**
+ * Fetch upcoming events with pagination parameters
+ */
 export const fetchUpcomingEvents = async (page = 1, limit = 20): Promise<EventData[]> => {
   try {
     const response = await api.get('/events/upcoming', {
-      params: { page, limit }
+      params: { page, limit },
     });
     return response.data;
   } catch (error) {
