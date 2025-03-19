@@ -78,4 +78,17 @@ export const getEventsByDateRange = async (startDate: string, endDate: string): 
   }
 };
 
+// Add pagination parameters to API functions
+export const fetchUpcomingEvents = async (page = 1, limit = 20): Promise<EventData[]> => {
+  try {
+    const response = await api.get('/events/upcoming', {
+      params: { page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching upcoming events:', error);
+    return [];
+  }
+};
+
 export default api;
