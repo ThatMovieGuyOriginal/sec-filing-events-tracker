@@ -16,6 +16,8 @@ interface LayoutProps {
   twitterCard?: 'summary' | 'summary_large_image';
   children: React.ReactNode;
   structuredData?: Record<string, any>;
+  keywords?: string; // Added keywords
+  author?: string;   // Added author
 }
 
 export const Layout: React.FC<LayoutProps> = ({ 
@@ -27,8 +29,8 @@ export const Layout: React.FC<LayoutProps> = ({
   twitterCard = 'summary_large_image',
   children,
   structuredData,
-  keywords = 'SEC filings, EDGAR, corporate events, insider trading, financial alerts', // Add keywords
-  author = 'SEC Filing Events Tracker', // Add author
+  keywords = 'SEC filings, EDGAR, corporate events, insider trading, financial alerts', // Default value
+  author = 'SEC Filing Events Tracker', // Default value
 }) => {
   const { showAds } = useAdContext();
   const fullTitle = `${title} | SEC Filing Events Tracker`;
@@ -71,6 +73,7 @@ export const Layout: React.FC<LayoutProps> = ({
       {structuredData && <JsonLd data={structuredData} />}
       
       {/* Rest of the component... */}
+      {children}
     </div>
   );
 };
