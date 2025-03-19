@@ -91,8 +91,9 @@ export class Form4Parser extends BaseParser {
         parsedData,
       };
     } catch (error) {
-      logger.error(`Error parsing Form 4 filing ${metadata.accessionNumber}:`, error);
-      throw new Error(`Failed to parse Form 4 filing: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error(`Error parsing Form 4 filing ${metadata.accessionNumber}: ${errorMessage}`);
+      throw new Error(`Failed to parse Form 4 filing: ${errorMessage}`);
     }
   }
 }
