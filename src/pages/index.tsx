@@ -9,6 +9,7 @@ import { EventData } from '../lib/events/event-extractor';
 import { fetchUpcomingEvents, searchCompany } from '../lib/api/client';
 import { Layout } from '../components/Layout';
 import { AdBanner } from '../components/AdBanner';
+import { GetServerSideProps } from 'next';
 
 /**
  * Main dashboard page
@@ -115,3 +116,30 @@ export default function Home() {
     </Layout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    // Server-side API call
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/events/upcoming?limit=20&page=1`);
+    const data = await response.json();
+    
+    return {
+      props: {
+        initialEvents: data.events || [],
+        pagination: data.pagination || {}
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return {
+      props: {
+        initialEvents: [],
+        pagination: {}
+      }
+    };
+  }
+};
+
+// Modify component to use SSR data
+export default function Home({ initialEvents, pagination }) {
+  const [events, setEvents] = useState<EventData[]>(initialEvents);
