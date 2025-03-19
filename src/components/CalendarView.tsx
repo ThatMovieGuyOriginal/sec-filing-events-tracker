@@ -146,6 +146,14 @@ export const CalendarView: React.FC<CalendarViewProps> = React.memo(({ events })
   );
 });
 
+interface ToolbarProps {
+  onNavigate: (action: 'PREV' | 'NEXT' | 'TODAY') => void;
+  onView: (view: string) => void;
+  views: string[];
+  view: string;
+  label: string;
+}
+
 // Custom mobile-responsive toolbar
 const MobileResponsiveToolbar = (props) => {
   return (
