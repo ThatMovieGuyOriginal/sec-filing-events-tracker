@@ -79,31 +79,6 @@ export const CalendarView: React.FC<CalendarViewProps> = React.memo(({ events })
     setSelectedEvent(null);
   }, []);
 
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md h-[calc(100vh-240px)]">
-      <Calendar
-        localizer={localizer}
-        events={calendarEvents}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: '100%' }}
-        onSelectEvent={handleEventClick}
-        eventPropGetter={eventStyleGetter}
-        views={['month', 'week', 'day']}
-        defaultView="month"
-        aria-label="Event calendar"
-      />
-      
-      {showModal && selectedEvent && (
-        <EventModal
-          event={selectedEvent}
-          onClose={handleCloseModal}
-        />
-      )}
-    </div>
-  );
-});
-
   // Add mobile-specific views
   const getViews = () => {
     // On mobile, only show agenda and month view
@@ -155,7 +130,7 @@ interface ToolbarProps {
 }
 
 // Custom mobile-responsive toolbar
-const MobileResponsiveToolbar = (props) => {
+const MobileResponsiveToolbar = (props: any) => {
   return (
     <div className="rbc-toolbar">
       <span className="rbc-btn-group">
@@ -171,7 +146,7 @@ const MobileResponsiveToolbar = (props) => {
       </span>
       <span className="rbc-toolbar-label">{props.label}</span>
       <span className="rbc-btn-group">
-        {props.views.map(view => (
+        {props.views.map((view: string) => (
           <button
             key={view}
             type="button"
