@@ -16,7 +16,7 @@ export const PaymentMethodsSection = ({ userData }: { userData: any }) => {
     try {
       const { data } = await axios.get('/api/user/payment-methods');
       setPaymentMethods(data);
-    } catch (error) {
+    } catch (error: any) {
       setMessage({ 
         type: 'error', 
         text: error.response?.data?.message || 'Failed to load payment methods' 
@@ -92,7 +92,7 @@ export const PaymentMethodsSection = ({ userData }: { userData: any }) => {
         </div>
       ) : (
         <div className="space-y-6">
-          {paymentMethods.map((method) => (
+          {paymentMethods.map((method: any) => (
             <div key={method.id} className="bg-gray-50 p-4 rounded-md flex justify-between items-center">
               <div>
                 <div className="font-medium">
@@ -130,7 +130,9 @@ export const PaymentMethodsSection = ({ userData }: { userData: any }) => {
 
       <div className="mt-6">
         <button
-          onClick={() => {/* Implement add payment method flow */}}
+          onClick={() => {
+            /* Implement add payment method flow */
+          }}
           className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Add Payment Method
