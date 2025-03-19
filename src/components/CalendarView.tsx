@@ -1,5 +1,5 @@
 // src/components/CalendarView.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -15,14 +15,13 @@ interface CalendarViewProps {
 /**
  * Calendar view for displaying upcoming events
  */
-export const CalendarView: React.FC<CalendarViewProps> = ({ events }) => {
-  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+export const CalendarView: React.FC<CalendarViewProps> = React.memo(({ events }) => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  // Convert events to calendar format
-  useEffect(() => {
-    const formattedEvents = events.map(event => {
+  // Convert events to calendar format - memoized to prevent unnecessary recalculations
+  const calendarEvents = useMemo(() => {
+    return events.map(event => {
       // Use execution date if available, otherwise use identified date
       const eventDate = event.executionDate ? new Date(event.executionDate) : new Date(event.identifiedDate);
       
@@ -34,18 +33,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ events }) => {
         resource: event,
       };
     });
-    
-    setCalendarEvents(formattedEvents);
   }, [events]);
 
-  // Handle event click
-  const handleEventClick = (event: any): void => {
+  // Handle event click - useCallback to prevent unnecessary recreations
+  const handleEventClick = useCallback((event: any): void => {
     setSelectedEvent(event.resource);
     setShowModal(true);
-  };
+  }, []);
 
-  // Custom event styling
-  const eventStyleGetter = (event: any) => {
+  // Custom event styling - memoized
+  const eventStyleGetter = useCallback((event: any) => {
     // Different colors for different event types
     const eventTypeColors: Record<string, string> = {
       nameChange: '#4CAF50',
@@ -74,7 +71,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ events }) => {
         display: 'block',
       },
     };
-  };
+  }, []);
+
+  // Modal close handler - useCallback
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+    setSelectedEvent(null);
+  }, []);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md h-[calc(100vh-240px)]">
@@ -88,17 +91,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ events }) => {
         eventPropGetter={eventStyleGetter}
         views={['month', 'week', 'day']}
         defaultView="month"
+        aria-label="Event calendar"
       />
       
       {showModal && selectedEvent && (
         <EventModal
           event={selectedEvent}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedEvent(null);
-          }}
+          onClose={handleCloseModal}
         />
       )}
     </div>
   );
-};
+});
+
+// Add display name for debugging
+CalendarView.displayName = 'CalendarView';
