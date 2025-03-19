@@ -21,18 +21,16 @@ const defaultConfig: SWRConfiguration = {
 /**
  * Hook for fetching upcoming events with SWR
  */
-export function useUpcomingEvents(limit: number = 50, refreshInterval: number = 300000) {
-  const { data, error, isLoading, mutate } = useSWR<EventData[]>(
-    `/api/events/upcoming?limit=${limit}`, 
+export function useUpcomingEvents(page = 1, limit = 20, refreshInterval = 300000) {
+  const { data, error, isLoading, mutate } = useSWR<{events: EventData[], pagination: any}>(
+    `/api/events/upcoming?page=${page}&limit=${limit}`, 
     fetcher,
-    {
-      ...defaultConfig,
-      refreshInterval, // refresh every 5 minutes by default
-    }
+    { ...defaultConfig, refreshInterval }
   );
 
   return {
-    events: data || [],
+    events: data?.events || [],
+    pagination: data?.pagination,
     isLoading,
     isError: error,
     refresh: mutate,
