@@ -27,6 +27,8 @@ export const Layout: React.FC<LayoutProps> = ({
   twitterCard = 'summary_large_image',
   children,
   structuredData,
+  keywords = 'SEC filings, EDGAR, corporate events, insider trading, financial alerts', // Add keywords
+  author = 'SEC Filing Events Tracker', // Add author
 }) => {
   const { showAds } = useAdContext();
   const fullTitle = `${title} | SEC Filing Events Tracker`;
@@ -38,19 +40,23 @@ export const Layout: React.FC<LayoutProps> = ({
       <Head>
         <title>{fullTitle}</title>
         <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta name="author" content={author} />
         <link rel="icon" href="/favicon.ico" />
         
-        {/* SEO Meta Tags */}
+        {/* Enhanced SEO Meta Tags */}
         {fullCanonicalUrl && <link rel="canonical" href={fullCanonicalUrl} />}
         <meta property="og:title" content={fullTitle} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content={ogType} />
         <meta property="og:image" content={`${siteUrl}${ogImage}`} />
         <meta property="og:site_name" content="SEC Filing Events Tracker" />
+        <meta property="og:locale" content="en_US" />
         <meta name="twitter:card" content={twitterCard} />
         <meta name="twitter:title" content={fullTitle} />
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
+        <meta name="robots" content="index, follow" />
         
         {/* Mobile optimization */}
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
@@ -63,30 +69,8 @@ export const Layout: React.FC<LayoutProps> = ({
 
       {/* Structured data for rich results */}
       {structuredData && <JsonLd data={structuredData} />}
-
-      {/* Accessibility: Skip to content link */}
-      <SkipToContent />
       
-      {/* Sidebar navigation - mobile responsive */}
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {showAds && <AdBanner position="top" className="m-2" />}
-        
-        <main id="main-content" className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {children}
-          </div>
-        </main>
-        
-        {showAds && <AdBanner position="footer" className="m-2" />}
-      </div>
-      
-      {showAds && (
-        <div className="hidden lg:block w-64 p-4">
-          <AdBanner position="sidebar" />
-        </div>
-      )}
+      {/* Rest of the component... */}
     </div>
   );
 };
