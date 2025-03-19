@@ -19,6 +19,8 @@ export const CTAButton: React.FC<CTAButtonProps> = ({
   trackingId,
   trackingData = {},
   variant = 'primary',
+  size = 'medium', // Add size prop
+  withArrow = false, // Add arrow indicator option
 }) => {
   const getButtonStyles = () => {
     switch (variant) {
@@ -51,6 +53,32 @@ export const CTAButton: React.FC<CTAButtonProps> = ({
         data-tracking-id={trackingId}
       >
         {text}
+      </a>
+    </Link>
+  );
+};
+
+  const getSizeStyles = () => {
+    switch (size) {
+      case 'small': return 'px-4 py-2 text-sm';
+      case 'large': return 'px-8 py-4 text-lg';
+      default: return 'px-6 py-3 text-base';
+    }
+  };
+
+  return (
+    <Link href={href}>
+      
+        onClick={handleClick}
+        className={`font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md transition-all duration-200 transform hover:scale-105 ${getButtonStyles()} ${getSizeStyles()} ${className}`}
+        data-tracking-id={trackingId}
+      >
+        {text}
+        {withArrow && (
+          <svg className="ml-2 -mr-1 w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"></path>
+          </svg>
+        )}
       </a>
     </Link>
   );
