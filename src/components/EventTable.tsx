@@ -2,43 +2,12 @@
 import React, { useState } from 'react';
 import { EventData } from '../lib/events/event-extractor';
 import { EventModal } from './EventModal';
-import Papa from 'papaparse';
+import { ResponsiveTable } from './ui/ResponsiveTable';
 
 interface EventTableProps {
   events: EventData[];
 }
 
-  const readCSVFile = async (filename: string): Promise<any[]> => {
-    try {
-      // Read file as arrayBuffer
-      const response = await window.fs.readFile(filename);
-      // Convert to text - handle both string and Uint8Array return types
-      const text = typeof response === 'string' 
-        ? response 
-        : new TextDecoder().decode(response);
-      
-      return new Promise((resolve, reject) => {
-        Papa.parse(text, {
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            resolve(results.data);
-          },
-          error: (error: any) => {
-            reject(error);
-          }
-        });
-      });
-    } catch (error: any) {
-      console.error(`Error reading CSV file ${filename}:`, error);
-      throw error;
-    }
-  };
-
-/**
- * Table view for displaying upcoming events
- */
 export const EventTable: React.FC<EventTableProps> = ({ events }) => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -82,7 +51,7 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
     activistInvestor: 'Activist Investor',
     institutionalInvestor: 'Institutional Investor',
     shareBuyback: 'Share Buyback',
-    reverseStockSplit: 'Reverse Stock Split',
+    reverseStockSplit: 'Reverse Split',
     uplisting: 'Uplisting',
     fdaApproval: 'FDA Approval',
     patentApproval: 'Patent Approval',
@@ -101,111 +70,85 @@ export const EventTable: React.FC<EventTableProps> = ({ events }) => {
     return 'bg-gray-100 text-gray-800';
   };
 
+  // Render status badge
+  const renderStatusBadge = (status: string) => (
+    <span
+      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(
+        status
+      )}`}
+    >
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  );
+
+  const columns = [
+    {
+      header: 'Company',
+      accessor: (event: EventData) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{event.companyName}</div>
+          <div className="text-sm text-gray-500">
+            {event.ticker || `CIK: ${event.cik}`}
+          </div>
+        </div>
+      ),
+      mobileLabel: 'Company',
+    },
+    {
+      header: 'Event Type',
+      accessor: (event: EventData) => (
+        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+          {eventTypeNames[event.type] || event.type}
+        </span>
+      ),
+      mobileLabel: 'Event',
+    },
+    {
+      header: 'Identified',
+      accessor: (event: EventData) => formatDate(event.identifiedDate),
+      mobileLabel: 'Identified',
+    },
+    {
+      header: 'Execution',
+      accessor: (event: EventData) => formatDate(event.executionDate),
+      mobileLabel: 'Execution',
+    },
+    {
+      header: 'Status',
+      accessor: (event: EventData) => renderStatusBadge(event.status),
+      mobileLabel: 'Status',
+    },
+    {
+      header: 'Action',
+      accessor: (event: EventData) => (
+        <button
+          className="text-blue-600 hover:text-blue-900"
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedEvent(event);
+            setShowModal(true);
+          }}
+          aria-label={`View details for ${event.companyName} ${eventTypeNames[event.type]}`}
+        >
+          View Details
+        </button>
+      ),
+      mobileLabel: '',
+    },
+  ];
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('companyName')}
-              >
-                Company
-                {sortField === 'companyName' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('type')}
-              >
-                Event Type
-                {sortField === 'type' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('identifiedDate')}
-              >
-                Identified
-                {sortField === 'identifiedDate' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('executionDate')}
-              >
-                Execution
-                {sortField === 'executionDate' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                onClick={() => handleSort('status')}
-              >
-                Status
-                {sortField === 'status' && (
-                  <span className="ml-1">{sortDirection === 'asc' ? '▲' : '▼'}</span>
-                )}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedEvents.map((event) => (
-              <tr key={event.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {event.companyName}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {event.ticker || `CIK: ${event.cik}`}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {eventTypeNames[event.type] || event.type}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(event.identifiedDate)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(event.executionDate)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(event.status)}`}
-                  >
-                    {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button
-                    className="text-blue-600 hover:text-blue-900"
-                    onClick={() => {
-                      setSelectedEvent(event);
-                      setShowModal(true);
-                    }}
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ResponsiveTable
+        columns={columns}
+        data={sortedEvents}
+        keyExtractor={(event) => event.id}
+        onRowClick={(event) => {
+          setSelectedEvent(event);
+          setShowModal(true);
+        }}
+        emptyMessage="No events found"
+      />
 
       {showModal && selectedEvent && (
         <EventModal
