@@ -27,18 +27,35 @@ The system monitors the following types of events from SEC filings:
 8. **Spin-offs & Special Dividends** (Form 8-K)
 9. **Debt Reduction & Refinancing** (Form 8-K)
 
+**Core Concepts**
+
+**SEC Filing Parsing**
+The application fetches SEC filings from the EDGAR API and parses them to extract relevant events using a modular parser system. Each parser specializes in a specific form type (8-K, 4, 13D, etc.) and extracts structured data.
+
+**Event Extraction**
+Events are extracted from parsed filings based on pattern matching and contextual analysis. The system identifies name changes, ticker changes, insider buying, and other significant corporate events.
+
+**Database Management**
+Events and company data are stored in a PostgreSQL database, with Prisma ORM providing type-safe access. In production, Supabase is used as the database provider.
+
+**Authentication and Authorization**
+The application uses JWT tokens for authentication, with middleware to protect API routes. Role-based access control ensures users can only access appropriate resources.
+
+**Responsive UI**
+The UI is built with React and TailwindCSS, with responsive components that work on both desktop and mobile devices. The design follows accessibility best practices (WCAG 2.1 AA).
+
 ## Architecture
 
 ![Architecture Diagram](https://via.placeholder.com/800x400?text=SEC+Tracker+Architecture)
 
-The application follows a modular architecture:
+The application follows a modern React/Next.js architecture with the following components:
 
-- **Data Collection**: Fetches and caches filings from SEC EDGAR API
-- **Data Processing**: Parses filings and extracts relevant events
-- **Database**: Stores structured event and company data
-- **API**: RESTful endpoints for data access
-- **Frontend**: Next.js web application with React components
-- **Automation**: GitHub Actions for daily data collection
+- **Frontend**: Next.js, React, TailwindCSS
+- **Backend**: Next.js API routes
+- **Database**: PostgreSQL via Prisma ORM (with Supabase in production)
+- **Data Processing**: Custom SEC EDGAR API client and event extraction system
+- **Authentication**: JWT-based auth system
+- **Deployment**: Vercel
 
 ## Technologies
 
@@ -54,9 +71,9 @@ The application follows a modular architecture:
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL database
-- GitHub account (for automation)
+- PostgreSQL or Supabase account
 - Vercel account (for deployment)
+- Git
 
 ### Local Development
 
@@ -116,27 +133,26 @@ node scripts/fetch-filings.js
 
 ```
 sec-filing-events-tracker/
-├── .github/               # GitHub Actions configuration
-├── scripts/               # Automation scripts
+├── .github/               # GitHub Actions workflows
+├── cypress/               # End-to-end tests
+├── prisma/                # Database schema and migrations
 ├── public/                # Static assets
 ├── src/
 │   ├── components/        # React components
-│   ├── lib/
+│   ├── contexts/          # React context providers
+│   ├── lib/               # Core functionality
+│   │   ├── analytics/     # Analytics tracking
+│   │   ├── database/      # Database connections and queries
 │   │   ├── edgar-api/     # SEC EDGAR API client
-│   │   ├── parsers/       # Form parsers
-│   │   ├── events/        # Event extraction
-│   │   ├── database/      # Database connection
+│   │   ├── events/        # Event extraction and processing
+│   │   ├── hooks/         # Custom React hooks
 │   │   ├── middleware/    # API middleware
+│   │   ├── parsers/       # SEC filing parsers
 │   │   └── utils/         # Utility functions
-│   ├── pages/
-│   │   ├── api/           # API routes
-│   │   └── index.tsx      # Main page
-│   └── styles/            # CSS styles
-├── prisma/                # Database schema
-├── .env.example          # Environment variables template
-├── package.json          # Project dependencies
-├── vercel.json           # Vercel configuration
-└── README.md             # Documentation
+│   ├── pages/             # Next.js pages and API routes
+│   └── styles/            # Global styles
+├── tests/                 # Unit and integration tests
+└── types/                 # TypeScript type definitions
 ```
 
 ## API Endpoints
