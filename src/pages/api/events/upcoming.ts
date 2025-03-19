@@ -12,9 +12,23 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
-    const events = await eventDatabase.getUpcomingEvents(limit);
-    return res.status(200).json(events);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = (page - 1) * limit;
+    
+    // Modified to support pagination
+    const events = await eventDatabase.getUpcomingEvents(limit, offset);
+    const total = await eventDatabase.getUpcomingEventsCount();
+    
+    return res.status(200).json({
+      events,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error('Error fetching upcoming events:', error);
     return res.status(500).json({ message: 'Internal server error' });
