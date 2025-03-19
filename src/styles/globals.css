@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Base HTML elements */
 html,
 body {
   padding: 0;
@@ -10,13 +11,31 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
+/* Mobile typography adjustments */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  body {
+    font-size: 1rem !important;
+  }
+  
+  .text-xs {
+    font-size: 0.75rem !important;
+  }
+  
+  .text-sm {
+    font-size: 0.875rem !important;
+  }
 }
 
 /* Calendar customizations */
@@ -24,10 +43,22 @@ a {
   font-family: Inter, system-ui, sans-serif;
 }
 
-.rbc-event {
-  border-radius: 4px !important;
-}
-
-.rbc-today {
-  background-color: #f3f8ff !important;
+/* Calendar mobile optimizations */
+@media (max-width: 640px) {
+  .rbc-toolbar {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .rbc-toolbar button {
+    padding: 6px 12px;
+  }
+  
+  .rbc-toolbar-label {
+    margin: 8px 0;
+  }
+  
+  .rbc-month-view, .rbc-time-view {
+    font-size: 0.75rem;
+  }
 }
