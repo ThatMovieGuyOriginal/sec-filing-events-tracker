@@ -57,6 +57,30 @@ body {
   .rbc-toolbar-label {
     margin: 8px 0;
   }
+
+  /* Mobile calendar-specific fixes */
+@media (max-width: 640px) {
+  .rbc-calendar {
+    height: 500px !important;
+  }
+  
+  .rbc-event {
+    padding: 2px 3px !important;
+  }
+  
+  .rbc-toolbar-label {
+    font-size: 1rem !important;
+    font-weight: 500;
+  }
+  
+  .rbc-btn-group button {
+    padding: 5px 7px !important;
+  }
+  
+  .rbc-agenda-view table.rbc-agenda-table {
+    font-size: 0.75rem !important;
+  }
+}
   
   .rbc-month-view, .rbc-time-view {
     font-size: 0.75rem;
