@@ -79,44 +79,6 @@ export const ResponsiveTable = <T extends Record<string, any>>({
         </table>
       </div>
 
-      {/* Mobile view - card style */}
-      <div className="md:hidden">
-        <ul className="divide-y divide-gray-200">
-          {data.map((item) => (
-            <li
-              key={keyExtractor(item)}
-              className={`p-4 ${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}`}
-              onClick={onRowClick ? () => onRowClick(item) : undefined}
-            >
-              <div className="space-y-3">
-                {columns.map((column, index) => (
-                  <div key={index} className="flex flex-col">
-                    <span className="text-xs font-medium text-gray-500">
-                      {column.mobileLabel || column.header}
-                    </span>
-                    <span className={`mt-1 ${column.cellClassName || ''}`}>
-                      {renderCell(item, column)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-};
-
-  return (
-    <div className={`overflow-hidden ${className}`}>
-      {/* Desktop view */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          {/* Table content... */}
-        </table>
-      </div>
-
       {/* Improved Mobile view - card style */}
       <div className="md:hidden">
         <ul className="divide-y divide-gray-200">
