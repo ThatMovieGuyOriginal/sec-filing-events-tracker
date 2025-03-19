@@ -75,6 +75,30 @@ export default function LandingPage() {
         onSecondaryCTAClick={() => setVideoModalOpen(true)}
       />
 
+      <section className="py-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center">
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-medium text-gray-900">Trusted by investors and secured with industry standards</h2>
+            </div>
+            <div className="flex flex-wrap justify-center gap-8">
+              <div className="flex items-center">
+                <img src="/trust-badges/ssl-secure.svg" alt="SSL Secure" className="h-12" />
+                <span className="ml-2 text-sm text-gray-600">256-bit SSL Encryption</span>
+              </div>
+              <div className="flex items-center">
+                <img src="/trust-badges/money-back.svg" alt="Money Back Guarantee" className="h-12" />
+                <span className="ml-2 text-sm text-gray-600">30-Day Money Back</span>
+              </div>
+              <div className="flex items-center">
+                <img src="/trust-badges/data-protection.svg" alt="Data Protection" className="h-12" />
+                <span className="ml-2 text-sm text-gray-600">GDPR Compliant</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Social proof section */}
       <CompanyLogos 
         title="Trusted by investors from top firms"
