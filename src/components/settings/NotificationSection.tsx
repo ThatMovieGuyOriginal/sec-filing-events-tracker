@@ -2,8 +2,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+interface NotificationSettings {
+  emailNotifications: boolean;
+  filingAlerts: boolean;
+  weeklyDigest: boolean;
+  marketingEmails: boolean;
+}
+
 export const NotificationSection = ({ userData }: { userData: any }) => {
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<NotificationSettings>({
     emailNotifications: userData?.preferences?.emailNotifications ?? true,
     filingAlerts: userData?.preferences?.filingAlerts ?? true,
     weeklyDigest: userData?.preferences?.weeklyDigest ?? true,
@@ -12,27 +19,30 @@ export const NotificationSection = ({ userData }: { userData: any }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const handleToggle = (setting) => {
+  // Type the parameter as a key of NotificationSettings to avoid implicit 'any'
+  const handleToggle = (setting: keyof NotificationSettings) => {
     setSettings({
       ...settings,
-      [setting]: !settings[setting]
+      [setting]: !settings[setting],
     });
   };
 
-  const handleSubmit = async (e) => {
+  // Type the event parameter to ensure proper type checking
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage({ type: '', text: '' });
 
     try {
       await axios.put('/api/user/preferences', {
-        preferences: settings
+        preferences: settings,
       });
       setMessage({ type: 'success', text: 'Notification preferences updated successfully' });
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to update notification preferences' 
+      const err = error as any;
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to update notification preferences',
       });
     } finally {
       setIsLoading(false);
@@ -69,7 +79,9 @@ export const NotificationSection = ({ userData }: { userData: any }) => {
               />
             </div>
             <div className="ml-3 text-sm">
-              <label htmlFor="emailNotifications" className="font-medium text-gray-700">Email Notifications</label>
+              <label htmlFor="emailNotifications" className="font-medium text-gray-700">
+                Email Notifications
+              </label>
               <p className="text-gray-500">Receive notifications via email.</p>
             </div>
           </div>
@@ -86,8 +98,12 @@ export const NotificationSection = ({ userData }: { userData: any }) => {
               />
             </div>
             <div className="ml-3 text-sm">
-              <label htmlFor="filingAlerts" className="font-medium text-gray-700">Filing Alerts</label>
-              <p className="text-gray-500">Get notified when new filings are detected for your watched companies.</p>
+              <label htmlFor="filingAlerts" className="font-medium text-gray-700">
+                Filing Alerts
+              </label>
+              <p className="text-gray-500">
+                Get notified when new filings are detected for your watched companies.
+              </p>
             </div>
           </div>
           
@@ -103,7 +119,9 @@ export const NotificationSection = ({ userData }: { userData: any }) => {
               />
             </div>
             <div className="ml-3 text-sm">
-              <label htmlFor="weeklyDigest" className="font-medium text-gray-700">Weekly Digest</label>
+              <label htmlFor="weeklyDigest" className="font-medium text-gray-700">
+                Weekly Digest
+              </label>
               <p className="text-gray-500">Receive a weekly summary of important events.</p>
             </div>
           </div>
@@ -120,7 +138,9 @@ export const NotificationSection = ({ userData }: { userData: any }) => {
               />
             </div>
             <div className="ml-3 text-sm">
-              <label htmlFor="marketingEmails" className="font-medium text-gray-700">Marketing Emails</label>
+              <label htmlFor="marketingEmails" className="font-medium text-gray-700">
+                Marketing Emails
+              </label>
               <p className="text-gray-500">Receive updates about new features and offers.</p>
             </div>
           </div>
