@@ -19,20 +19,20 @@ export const AccountSection = ({ userData }: { userData: any }) => {
   const router = useRouter();
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPassword({
-        ...password,
-        [e.target.name]: e.target.value
-      });
-    };
+    setPassword({
+      ...password,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (password.new !== password.confirm) {
       setMessage({ type: 'error', text: 'New passwords do not match' });
       return;
     }
-    
+
     setIsLoading(true);
     setMessage({ type: '', text: '' });
 
@@ -41,14 +41,15 @@ export const AccountSection = ({ userData }: { userData: any }) => {
         currentPassword: password.current,
         newPassword: password.new,
       });
-      
+
       setMessage({ type: 'success', text: 'Password changed successfully' });
       setPassword({ current: '', new: '', confirm: '' });
       setIsChangingPassword(false);
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to change password' 
+      const err = error as any;
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to change password',
       });
     } finally {
       setIsLoading(false);
@@ -59,11 +60,11 @@ export const AccountSection = ({ userData }: { userData: any }) => {
     if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       return;
     }
-    
+
     if (!confirm('All your data will be permanently deleted. Type "DELETE" to confirm.')) {
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
@@ -72,9 +73,10 @@ export const AccountSection = ({ userData }: { userData: any }) => {
       localStorage.removeItem('token');
       router.push('/');
     } catch (error) {
-      setMessage({ 
-        type: 'error', 
-        text: error.response?.data?.message || 'Failed to delete account' 
+      const err = error as any;
+      setMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to delete account',
       });
       setIsLoading(false);
     }
@@ -83,13 +85,11 @@ export const AccountSection = ({ userData }: { userData: any }) => {
   return (
     <div>
       <h2 className="text-lg font-medium text-gray-900 mb-4">Account Settings</h2>
-      
+
       {message.text && (
-        <div 
+        <div
           className={`mb-4 p-3 rounded-md ${
-            message.type === 'success' 
-              ? 'bg-green-50 text-green-700' 
-              : 'bg-red-50 text-red-700'
+            message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
           }`}
         >
           {message.text}
@@ -104,7 +104,7 @@ export const AccountSection = ({ userData }: { userData: any }) => {
             <div className="mt-2 max-w-xl text-sm text-gray-500">
               <p>Update your password for enhanced security.</p>
             </div>
-            
+
             {!isChangingPassword ? (
               <div className="mt-5">
                 <button
@@ -119,7 +119,9 @@ export const AccountSection = ({ userData }: { userData: any }) => {
               <form onSubmit={handleChangePassword} className="mt-5 sm:flex sm:items-center">
                 <div className="w-full sm:max-w-md space-y-4">
                   <div>
-                    <label htmlFor="current" className="sr-only">Current Password</label>
+                    <label htmlFor="current" className="sr-only">
+                      Current Password
+                    </label>
                     <input
                       id="current"
                       name="current"
@@ -132,7 +134,9 @@ export const AccountSection = ({ userData }: { userData: any }) => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="new" className="sr-only">New Password</label>
+                    <label htmlFor="new" className="sr-only">
+                      New Password
+                    </label>
                     <input
                       id="new"
                       name="new"
@@ -145,7 +149,9 @@ export const AccountSection = ({ userData }: { userData: any }) => {
                     />
                   </div>
                   <div>
-                    <label htmlFor="confirm" className="sr-only">Confirm New Password</label>
+                    <label htmlFor="confirm" className="sr-only">
+                      Confirm New Password
+                    </label>
                     <input
                       id="confirm"
                       name="confirm"
@@ -192,7 +198,9 @@ export const AccountSection = ({ userData }: { userData: any }) => {
             <div className="mt-5">
               <button
                 type="button"
-                onClick={() => {/* Implement data export */}}
+                onClick={() => {
+                  /* Implement data export */
+                }}
                 className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Export data
