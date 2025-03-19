@@ -5,6 +5,7 @@ import { AdProvider } from '../contexts/AdContext';
 import Script from 'next/script';
 import { useEffect } from 'react';
 import initWindowFs from '../lib/utils/window-fs';
+import dynamic from 'next/dynamic';
 
 function MyApp({ Component, pageProps }: AppProps) {
   // Initialize window.fs utility
@@ -34,5 +35,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     </AdProvider>
   );
 }
+
+// Dynamically import heavy components
+const DynamicCalendarView = dynamic(
+  () => import('../components/CalendarView'),
+  { ssr: false, loading: () => <div className="h-64 flex items-center justify-center">Loading calendar...</div> }
+);
 
 export default MyApp;
