@@ -1,4 +1,16 @@
 // src/components/marketing/Testimonial.tsx
+
+interface TestimonialProps {
+  quote: string;
+  author: string;
+  title: string;
+  companyName?: string;
+  companyLogo?: string;
+  avatar?: string;
+  rating: number;
+  verified?: boolean;
+}
+
 export const Testimonial: React.FC<TestimonialProps> = ({
   quote,
   author,
