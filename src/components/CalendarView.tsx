@@ -104,5 +104,79 @@ export const CalendarView: React.FC<CalendarViewProps> = React.memo(({ events })
   );
 });
 
+  // Add mobile-specific views
+  const getViews = () => {
+    // On mobile, only show agenda and month view
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return { month: true, agenda: true };
+    }
+    
+    // On desktop, show all views
+    return { month: true, week: true, day: true };
+  };
+  
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md h-[calc(100vh-240px)]">
+      <Calendar
+        localizer={localizer}
+        events={calendarEvents}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: '100%' }}
+        onSelectEvent={handleEventClick}
+        eventPropGetter={eventStyleGetter}
+        views={getViews()}
+        defaultView="month"
+        aria-label="Event calendar"
+        toolbar={true}
+        // Mobile-friendly settings
+        popup={true}
+        components={{
+          toolbar: MobileResponsiveToolbar,
+        }}
+      />
+      
+      {showModal && selectedEvent && (
+        <EventModal
+          event={selectedEvent}
+          onClose={handleCloseModal}
+        />
+      )}
+    </div>
+  );
+});
+
+// Custom mobile-responsive toolbar
+const MobileResponsiveToolbar = (props) => {
+  return (
+    <div className="rbc-toolbar">
+      <span className="rbc-btn-group">
+        <button type="button" onClick={() => props.onNavigate('PREV')}>
+          &lt;
+        </button>
+        <button type="button" onClick={() => props.onNavigate('TODAY')}>
+          Today
+        </button>
+        <button type="button" onClick={() => props.onNavigate('NEXT')}>
+          &gt;
+        </button>
+      </span>
+      <span className="rbc-toolbar-label">{props.label}</span>
+      <span className="rbc-btn-group">
+        {props.views.map(view => (
+          <button
+            key={view}
+            type="button"
+            className={view === props.view ? 'rbc-active' : ''}
+            onClick={() => props.onView(view)}
+          >
+            {view === 'month' ? 'Month' : view === 'agenda' ? 'List' : view.charAt(0).toUpperCase() + view.slice(1)}
+          </button>
+        ))}
+      </span>
+    </div>
+  );
+};
+
 // Add display name for debugging
 CalendarView.displayName = 'CalendarView';
