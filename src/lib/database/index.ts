@@ -1,5 +1,5 @@
 // src/lib/database/index.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { EventData } from '../events/event-extractor';
 import logger from '../utils/logger';
 
@@ -70,7 +70,7 @@ export class EventDatabase {
       const savedEvents: EventData[] = [];
       
       // Run in a transaction to ensure all events are saved or none
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         for (const event of events) {
           // Check if this event already exists
           const existingEvent = await tx.event.findUnique({
