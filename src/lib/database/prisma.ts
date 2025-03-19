@@ -1,7 +1,15 @@
 // src/lib/database/prisma.ts
 import { PrismaClient } from '@prisma/client';
-import type { MiddlewareParams } from '@prisma/client/runtime';
 import logger from '../utils/logger';
+
+// Define a minimal MiddlewareParams type
+type MiddlewareParams = {
+  model?: string;
+  action: string;
+  args: any;
+  dataPath: string[];
+  runInTransaction: boolean;
+};
 
 // Augment the global object to include a prisma property
 declare global {
