@@ -152,6 +152,30 @@ sec-filing-events-tracker/
 | `/api/watchlists/[id]/companies` | POST/DELETE | Add/remove companies from watchlist |
 | `/api/alerts` | GET/POST | Get or create alerts |
 
+## Secret Management
+
+This project requires proper secret management. Follow these steps to securely set up your environment:
+
+1. **Local Development**
+   - Copy `.env.example` to `.env.local`
+   - Generate strong random values for JWT_SECRET and CSRF_SECRET
+   - Never commit `.env.local` to version control
+
+2. **Vercel Deployment**
+   - Add all environment variables in Vercel's dashboard
+   - Use Vercel's integration with Supabase for automatic environment setup
+   - Ensure production secrets are different from development
+
+3. **Supabase Configuration**
+   - Create a new Supabase project
+   - Configure database policy permissions
+   - Set up auth providers and domains
+   - Generate and securely store API keys
+
+4. **Secret Rotation**
+   - Rotate JWT_SECRET and other sensitive secrets regularly
+   - Update Vercel environment variables after rotation
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
