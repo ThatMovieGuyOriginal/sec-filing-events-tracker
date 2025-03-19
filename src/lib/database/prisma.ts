@@ -1,5 +1,6 @@
 // src/lib/database/prisma.ts
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import type { MiddlewareParams } from '@prisma/client/runtime';
 import logger from '../utils/logger';
 
 // Augment the global object to include a prisma property
@@ -28,8 +29,8 @@ if (process.env.NODE_ENV === 'production') {
 // Log any database errors with explicit types for middleware parameters
 prisma.$use(
   async (
-    params: Prisma.MiddlewareParams,
-    next: (params: Prisma.MiddlewareParams) => Promise<any>
+    params: MiddlewareParams,
+    next: (params: MiddlewareParams) => Promise<any>
   ) => {
     try {
       return await next(params);
