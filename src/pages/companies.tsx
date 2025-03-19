@@ -256,3 +256,33 @@ export default function Companies() {
     </Layout>
   );
 }
+
+  // Generate structured data for SEO
+  const generateStructuredData = () => {
+    if (!selectedCompany) return null;
+    
+    return {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": selectedCompany.name,
+      "identifier": selectedCompany.cik,
+      "tickerSymbol": selectedCompany.ticker || "",
+      "industry": selectedCompany.industry || "",
+      "description": selectedCompany.description || `SEC filing events for ${selectedCompany.name}`,
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": `https://secfilingstracker.com/companies/${selectedCompany.cik}`
+      }
+    };
+  };
+  
+  return (
+    <Layout 
+      title="Companies" 
+      description={selectedCompany ? `View SEC filing events for ${selectedCompany.name}` : "Search and track SEC filings for public companies"}
+      structuredData={generateStructuredData()}
+    >
+      {/* Component content... */}
+    </Layout>
+  );
+}
