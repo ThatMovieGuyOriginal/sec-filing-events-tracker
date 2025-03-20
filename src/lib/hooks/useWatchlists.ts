@@ -2,7 +2,7 @@
 import useSWR from 'swr';
 import axios from 'axios';
 
-const fetcher = url => axios.get(url).then(res => res.data);
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 export function useWatchlists() {
   const { data, error, mutate } = useSWR('/api/watchlists', fetcher);
