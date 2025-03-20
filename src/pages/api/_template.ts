@@ -3,8 +3,8 @@
 // Example implementation for an API route:
 
 import { NextApiRequest, NextApiResponse } from 'next';
-import { withAuth, AuthenticatedRequest } from '../../../lib/middleware/auth';
-import logger from '../../../lib/utils/logger';
+import { withAuth, AuthenticatedRequest } from '../../lib/middleware/auth';
+import logger from '../../lib/utils/logger';
 
 // CORS headers middleware
 const allowCors = (handler) => async (req: NextApiRequest, res: NextApiResponse) => {
