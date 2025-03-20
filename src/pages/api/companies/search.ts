@@ -3,6 +3,17 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../lib/database';
 import { withAuth } from '../../../lib/middleware/auth';
 
+interface Company {
+  cik: string;
+  name: string;
+  tickers: string[];
+  // Add other possible company properties here
+  industry?: string;
+  sector?: string;
+  description?: string;
+  website?: string;
+}
+
 /**
  * API endpoint for searching companies by name or ticker
  */
@@ -29,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       take: 10,
     });
 
-    return res.status(200).json(companies.map(company => ({
+    return res.status(200).json(companies.map((company: Company) => ({
       cik: company.cik,
       name: company.name,
       ticker: company.tickers[0],
