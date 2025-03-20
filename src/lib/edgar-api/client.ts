@@ -116,13 +116,8 @@ export class EdgarApiClient {
    * @param config Configuration for the API client
    */
   constructor(config: EdgarApiConfig) {
-    // Create a complete config by merging defaults with provided config
-    this.config = {
-      rateLimit: 5,
-      maxRetries: 3,
-      retryDelay: 1000,
-      ...config, // This will properly override any defaults if provided in config
-    };
+    // Just use the config directly - we'll make sure it's complete in the factory function
+    this.config = config;
 
     // Create axios instance with rate limiting to avoid SEC blocks
     const axiosAdapter = axios.defaults.adapter as AxiosAdapter;
@@ -312,12 +307,15 @@ export class EdgarApiClient {
 
 // Export a factory function to create the client with proper configuration
 export const createEdgarClient = (config: Partial<EdgarApiConfig> = {}): EdgarApiClient => {
-  return new EdgarApiClient({
+  // Create a complete config by merging defaults with provided config
+  const fullConfig: EdgarApiConfig = {
     userAgent: process.env.SEC_API_EMAIL || 'example@example.com',
     rateLimit: 2, // Conservative rate limit
     baseUrl: 'https://www.sec.gov/Archives/edgar',
     maxRetries: 3,
     retryDelay: 1000,
     ...config,
-  });
+  };
+  
+  return new EdgarApiClient(fullConfig);
 };
