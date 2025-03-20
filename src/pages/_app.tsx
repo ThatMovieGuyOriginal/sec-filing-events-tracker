@@ -38,7 +38,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 // Dynamically import heavy components
 const DynamicCalendarView = dynamic(
-  () => import('../components/CalendarView'),
+  () => import('../components/CalendarView').then(mod => mod.CalendarView),
   { ssr: false, loading: () => <div className="h-64 flex items-center justify-center">Loading calendar...</div> }
 );
 
