@@ -6,8 +6,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { withAuth, AuthenticatedRequest } from '../../lib/middleware/auth';
 import logger from '../../lib/utils/logger';
 
+// Define a type for API handlers
+type ApiHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
+
 // CORS headers middleware
-const allowCors = (handler) => async (req: NextApiRequest, res: NextApiResponse) => {
+const allowCors = (handler: ApiHandler): ApiHandler => async (req: NextApiRequest, res: NextApiResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,20 +31,23 @@ const allowCors = (handler) => async (req: NextApiRequest, res: NextApiResponse)
 };
 
 // Main handler with error handling
-async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse): Promise<void> {
   try {
     // Route-specific logic here
     // For example:
     if (req.method === 'GET') {
       // Handle GET
-      return res.status(200).json({ /* your data */ });
+      res.status(200).json({ /* your data */ });
+      return;
     } else if (req.method === 'POST') {
       // Handle POST
-      return res.status(201).json({ /* created resource */ });
+      res.status(201).json({ /* created resource */ });
+      return;
     } else {
-      return res.status(405).json({ message: 'Method not allowed' });
+      res.status(405).json({ message: 'Method not allowed' });
+      return;
     }
-  } catch (error) {
+  } catch (error: any) {
     // Log the error
     logger.error(`API error in [handler]: ${error.message}`, error);
     
@@ -49,9 +55,10 @@ async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
     const statusCode = error.statusCode || 500;
     
     // Return error response
-    return res.status(statusCode).json({ 
+    res.status(statusCode).json({ 
       message: statusCode === 500 ? 'Internal server error' : error.message
     });
+    return;
   }
 }
 
