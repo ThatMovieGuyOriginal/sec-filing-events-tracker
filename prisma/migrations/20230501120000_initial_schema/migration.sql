@@ -1,4 +1,4 @@
-// prisma/migrations/20230501120000_initial_schema/migration.sql
+-- prisma/migrations/20230501120000_initial_schema/migration.sql
 -- CreateTable for users, events, companies, watchlists, alerts
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
