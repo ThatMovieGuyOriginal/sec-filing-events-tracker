@@ -49,41 +49,59 @@ export class Form4Parser extends BaseParser {
         }
       }
       
-      // Extract all transactions
-      const transactionBlocks = filingContent.match(/<nonDerivativeTransaction>(.*?)<\/nonDerivativeTransaction>/gs);
-      if (transactionBlocks) {
-        for (const block of transactionBlocks) {
-          // Extract transaction code (P = purchase, S = sale)
-          const codeMatch = block.match(/<transactionCode>(.*?)<\/transactionCode>/);
-          const code = codeMatch?.[1] || '';
-          
-          // Extract shares
-          const sharesMatch = block.match(/<transactionShares>(.*?)<\/transactionShares>/);
-          const shares = sharesMatch?.[1] ? parseFloat(sharesMatch[1]) : 0;
-          
-          // Extract price per share
-          const priceMatch = block.match(/<transactionPricePerShare>(.*?)<\/transactionPricePerShare>/);
-          const price = priceMatch?.[1] ? parseFloat(priceMatch[1]) : 0;
-          
-          // Extract transaction date
-          const dateMatch = block.match(/<transactionDate>(.*?)<\/transactionDate>/);
-          const date = dateMatch?.[1] || '';
-          
-          const transaction = {
-            code,
-            shares,
-            price,
-            date,
-            value: shares * price,
-            isPurchase: code === 'P',
-          };
-          
-          parsedData.transactions.push(transaction);
-          
-          // Check for insider buying (code P = purchase)
-          if (code === 'P' && parsedData.isInsider) {
-            parsedData.insiderBuying = true;
-          }
+      // Extract all transactions - replace regex with global flag with manual extraction
+      const transactions = [];
+      const transStartTag = '<nonDerivativeTransaction>';
+      const transEndTag = '</nonDerivativeTransaction>';
+      
+      let pos = 0;
+      while (true) {
+        const startPos = filingContent.indexOf(transStartTag, pos);
+        if (startPos === -1) break;
+        
+        const endPos = filingContent.indexOf(transEndTag, startPos);
+        if (endPos === -1) break;
+        
+        // Extract the transaction block
+        const block = filingContent.substring(startPos, endPos + transEndTag.length);
+        transactions.push(block);
+        
+        // Move past this transaction for the next iteration
+        pos = endPos + transEndTag.length;
+      }
+      
+      // Process each transaction block
+      for (const block of transactions) {
+        // Extract transaction code (P = purchase, S = sale)
+        const codeMatch = block.match(/<transactionCode>(.*?)<\/transactionCode>/);
+        const code = codeMatch?.[1] || '';
+        
+        // Extract shares
+        const sharesMatch = block.match(/<transactionShares>(.*?)<\/transactionShares>/);
+        const shares = sharesMatch?.[1] ? parseFloat(sharesMatch[1]) : 0;
+        
+        // Extract price per share
+        const priceMatch = block.match(/<transactionPricePerShare>(.*?)<\/transactionPricePerShare>/);
+        const price = priceMatch?.[1] ? parseFloat(priceMatch[1]) : 0;
+        
+        // Extract transaction date
+        const dateMatch = block.match(/<transactionDate>(.*?)<\/transactionDate>/);
+        const date = dateMatch?.[1] || '';
+        
+        const transaction = {
+          code,
+          shares,
+          price,
+          date,
+          value: shares * price,
+          isPurchase: code === 'P',
+        };
+        
+        parsedData.transactions.push(transaction);
+        
+        // Check for insider buying (code P = purchase)
+        if (code === 'P' && parsedData.isInsider) {
+          parsedData.insiderBuying = true;
         }
       }
       
