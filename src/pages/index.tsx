@@ -11,32 +11,36 @@ import { Layout } from '../components/Layout';
 import { AdBanner } from '../components/AdBanner';
 import { GetServerSideProps } from 'next';
 
-/**
- * Main dashboard page
- */
-export default function Home() {
-  const [events, setEvents] = useState<EventData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+interface HomeProps {
+  initialEvents: EventData[];
+  pagination: any;
+}
+
+const Home: React.FC<HomeProps> = ({ initialEvents, pagination }) => {
+  const [events, setEvents] = useState<EventData[]>(initialEvents);
+  const [loading, setLoading] = useState<boolean>(false);
   const [view, setView] = useState<'calendar' | 'table'>('calendar');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filters, setFilters] = useState<string[]>([]);
 
-  // Load initial data
+  // Load more data if initial data is empty
   useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchUpcomingEvents();
-        setEvents(data);
-      } catch (error) {
-        console.error('Failed to load upcoming events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadEvents();
-  }, []);
+    if (initialEvents.length === 0) {
+      const loadEvents = async () => {
+        try {
+          setLoading(true);
+          const data = await fetchUpcomingEvents();
+          setEvents(data);
+        } catch (error) {
+          console.error('Failed to load upcoming events:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      loadEvents();
+    }
+  }, [initialEvents]);
 
   // Handle company search
   const handleSearch = async (term: string) => {
@@ -115,7 +119,7 @@ export default function Home() {
       )}
     </Layout>
   );
-}
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   try {
@@ -140,6 +144,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 };
 
-// Modify component to use SSR data
-export default function Home({ initialEvents, pagination }) {
-  const [events, setEvents] = useState<EventData[]>(initialEvents);
+export default Home;
