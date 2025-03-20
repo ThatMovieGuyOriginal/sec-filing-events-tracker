@@ -37,7 +37,8 @@
     "stripe": "^13.8.0",
     "swr": "^2.2.4",
     "winston": "^3.10.0",
-    "xmldom": "^0.6.0"
+    "xmldom": "^0.6.0",
+    "@supabase/supabase-js": "^2.38.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.3",
