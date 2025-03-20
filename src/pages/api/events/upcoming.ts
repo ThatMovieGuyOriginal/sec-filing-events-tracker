@@ -43,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const total = await eventDatabase.getUpcomingEventsCount();
     
     return res.status(200).json({
-      events,
+      events: eventsArray,
       pagination: {
         page,
         limit,
