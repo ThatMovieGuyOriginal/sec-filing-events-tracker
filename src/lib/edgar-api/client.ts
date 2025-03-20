@@ -116,12 +116,12 @@ export class EdgarApiClient {
    * @param config Configuration for the API client
    */
   constructor(config: EdgarApiConfig) {
+    // Create a complete config by merging defaults with provided config
     this.config = {
-      baseUrl: 'https://www.sec.gov/Archives/edgar',
       rateLimit: 5,
       maxRetries: 3,
       retryDelay: 1000,
-      ...config,
+      ...config, // This will properly override any defaults if provided in config
     };
 
     // Create axios instance with rate limiting to avoid SEC blocks
