@@ -28,6 +28,25 @@ export default function Companies() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const { showAds } = useAdContext();
 
+  // Generate structured data for SEO
+  const generateStructuredData = () => {
+    if (!selectedCompany) return null;
+    
+    return {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": selectedCompany.name,
+      "identifier": selectedCompany.cik,
+      "tickerSymbol": selectedCompany.ticker || "",
+      "industry": selectedCompany.industry || "",
+      "description": selectedCompany.description || `SEC filing events for ${selectedCompany.name}`,
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": `https://secfilingstracker.com/companies/${selectedCompany.cik}`
+      }
+    };
+  };
+
   // Handle company search
   const handleSearch = async (query: string) => {
     if (!query.trim()) return;
@@ -115,7 +134,11 @@ export default function Companies() {
   };
 
   return (
-    <Layout title="Companies">
+    <Layout 
+      title="Companies" 
+      description={selectedCompany ? `View SEC filing events for ${selectedCompany.name}` : "Search and track SEC filings for public companies"}
+      structuredData={generateStructuredData()}
+    >
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Companies</h1>
         
@@ -213,7 +236,7 @@ export default function Companies() {
                     {/* Watchlist dropdown would go here */}
                   </div>
                   
-                  <a
+                  
                     href={`https://www.sec.gov/edgar/browse/?CIK=${selectedCompany.cik}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -253,36 +276,6 @@ export default function Companies() {
           </div>
         )}
       </div>
-    </Layout>
-  );
-}
-
-  // Generate structured data for SEO
-  const generateStructuredData = () => {
-    if (!selectedCompany) return null;
-    
-    return {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": selectedCompany.name,
-      "identifier": selectedCompany.cik,
-      "tickerSymbol": selectedCompany.ticker || "",
-      "industry": selectedCompany.industry || "",
-      "description": selectedCompany.description || `SEC filing events for ${selectedCompany.name}`,
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": `https://secfilingstracker.com/companies/${selectedCompany.cik}`
-      }
-    };
-  };
-  
-  return (
-    <Layout 
-      title="Companies" 
-      description={selectedCompany ? `View SEC filing events for ${selectedCompany.name}` : "Search and track SEC filings for public companies"}
-      structuredData={generateStructuredData()}
-    >
-      {/* Component content... */}
     </Layout>
   );
 }
