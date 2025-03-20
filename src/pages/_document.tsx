@@ -1,7 +1,3 @@
-## Final Performance Optimizations
-
-### Lighthouse Score Improvement
-```typescript
 // src/pages/_document.tsx
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
 
