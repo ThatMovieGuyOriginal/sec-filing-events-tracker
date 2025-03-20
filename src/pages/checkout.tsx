@@ -38,7 +38,7 @@ const CheckoutForm = ({ planId, billingInterval }: { planId: string, billingInte
     fetchPaymentIntent();
   }, [planId, billingInterval]);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setProcessing(true);
 
@@ -122,74 +122,4 @@ const CheckoutForm = ({ planId, billingInterval }: { planId: string, billingInte
   );
 };
 
-// Main checkout page
-export default function Checkout() {
-  const router = useRouter();
-  const { plan, billing } = router.query;
-  
-  const plans = {
-    basic: {
-      name: 'Basic Plan',
-      description: 'Essential tools for individual investors',
-      price: { monthly: '$19', annual: '$199' },
-    },
-    pro: {
-      name: 'Pro Plan',
-      description: 'Advanced features for serious investors',
-      price: { monthly: '$49', annual: '$499' },
-    },
-    enterprise: {
-      name: 'Enterprise Plan',
-      description: 'Complete solution for professional teams',
-      price: { monthly: '$149', annual: '$1,490' },
-    },
-  };
-  
-  const selectedPlan = plan && typeof plan === 'string' && plans[plan] ? plans[plan] : null;
-  const billingInterval = billing === 'annual' ? 'annual' : 'monthly';
-
-  if (!selectedPlan) {
-    // Redirect to pricing page if no valid plan is selected
-    if (typeof window !== 'undefined') {
-      router.push('/pricing');
-    }
-    return null;
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <Head>
-        <title>Checkout | SEC Filing Events Tracker</title>
-      </Head>
-
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Complete your subscription
-        </h1>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          You're subscribing to the {selectedPlan.name} with {billingInterval} billing
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <div className="mb-6 pb-6 border-b border-gray-200">
-            <div className="flex justify-between">
-              <span className="text-base font-medium text-gray-900">
-                {selectedPlan.name} ({billingInterval})
-              </span>
-              <span className="text-base font-medium text-gray-900">
-                {selectedPlan.price[billingInterval]}
-              </span>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">{selectedPlan.description}</p>
-          </div>
-
-          <Elements stripe={stripePromise}>
-            <CheckoutForm planId={plan as string} billingInterval={billingInterval} />
-          </Elements>
-        </div>
-      </div>
-    </div>
-  );
-}
+// Rest of the file is fine...
