@@ -59,7 +59,6 @@ body {
   }
 
   /* Mobile calendar-specific fixes */
-@media (max-width: 640px) {
   .rbc-calendar {
     height: 500px !important;
   }
@@ -80,7 +79,6 @@ body {
   .rbc-agenda-view table.rbc-agenda-table {
     font-size: 0.75rem !important;
   }
-}
   
   .rbc-month-view, .rbc-time-view {
     font-size: 0.75rem;
