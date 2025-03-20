@@ -1,4 +1,5 @@
 // src/components/marketing/Testimonial.tsx
+import React from 'react';
 
 interface TestimonialProps {
   quote: string;
@@ -15,11 +16,11 @@ export const Testimonial: React.FC<TestimonialProps> = ({
   quote,
   author,
   title,
-  companyName, // Add company name
-  companyLogo, // Add company logo
+  companyName,
+  companyLogo,
   avatar,
   rating,
-  verified = false, // Add verified indicator
+  verified = false,
 }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
