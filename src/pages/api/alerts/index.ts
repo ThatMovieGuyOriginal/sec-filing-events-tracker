@@ -9,6 +9,11 @@ import { withAuth, AuthenticatedRequest } from '../../../lib/middleware/auth';
 async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   const userId = req.user?.id;
 
+  // Check if user is authenticated
+  if (!userId) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
   switch (req.method) {
     case 'GET':
       return await getUserAlerts(req, res, userId);
