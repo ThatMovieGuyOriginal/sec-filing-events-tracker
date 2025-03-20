@@ -29,18 +29,24 @@ export class Form4Parser extends BaseParser {
       }
       
       // Extract relationship to issuer (director, officer, 10% owner)
-      const relationshipRegex = /<rptOwnerRelationship>(.*?)<\/rptOwnerRelationship>/s;
-      const relationshipMatch = filingContent.match(relationshipRegex);
-      if (relationshipMatch && relationshipMatch[1]) {
-        const relationship = relationshipMatch[1];
-        parsedData.relationship = relationship;
-        
-        // Check if the person is an insider (director, officer, or 10% owner)
-        const isDirector = /<isDirector>1<\/isDirector>/.test(relationship);
-        const isOfficer = /<isOfficer>1<\/isOfficer>/.test(relationship);
-        const isTenPercentOwner = /<isTenPercentOwner>1<\/isTenPercentOwner>/.test(relationship);
-        
-        parsedData.isInsider = isDirector || isOfficer || isTenPercentOwner;
+      // Replace regex with /s flag with manual string extraction
+      const startToken = '<rptOwnerRelationship>';
+      const endToken = '</rptOwnerRelationship>';
+      const relStart = filingContent.indexOf(startToken);
+      if (relStart !== -1) {
+        const contentStart = relStart + startToken.length;
+        const relEnd = filingContent.indexOf(endToken, contentStart);
+        if (relEnd !== -1) {
+          const relationship = filingContent.substring(contentStart, relEnd);
+          parsedData.relationship = relationship;
+          
+          // Check if the person is an insider (director, officer, or 10% owner)
+          const isDirector = /<isDirector>1<\/isDirector>/.test(relationship);
+          const isOfficer = /<isOfficer>1<\/isOfficer>/.test(relationship);
+          const isTenPercentOwner = /<isTenPercentOwner>1<\/isTenPercentOwner>/.test(relationship);
+          
+          parsedData.isInsider = isDirector || isOfficer || isTenPercentOwner;
+        }
       }
       
       // Extract all transactions
