@@ -51,20 +51,26 @@ export class Form13DParser extends BaseParser {
         parsedData.percentOwned = parseFloat(percentOwnedMatch[1]);
       }
       
-      // Extract purpose of transaction
-      const purposeRegex = /<purpose>(.*?)<\/purpose>/s;
-      const purposeMatch = filingContent.match(purposeRegex);
-      if (purposeMatch && purposeMatch[1]) {
-        parsedData.purpose = purposeMatch[1];
-        
-        // Check if this appears to be an activist investor based on purpose
-        const activistKeywords = [
-          'change board', 'management change', 'strategic alternatives',
-          'strategic review', 'sell the company', 'merger', 'acquisition',
-          'activist', 'proxy contest', 'board seat', 'director nomination'
-        ];
-        
-        parsedData.isActivist = this.hasKeywords(parsedData.purpose, activistKeywords);
+      // Extract purpose of transaction - Modified to avoid using /s flag
+      // Instead of /<purpose>(.*?)<\/purpose>/s
+      const startToken = '<purpose>';
+      const endToken = '</purpose>';
+      const purposeStart = filingContent.indexOf(startToken);
+      if (purposeStart !== -1) {
+        const contentStart = purposeStart + startToken.length;
+        const purposeEnd = filingContent.indexOf(endToken, contentStart);
+        if (purposeEnd !== -1) {
+          parsedData.purpose = filingContent.substring(contentStart, purposeEnd);
+          
+          // Check if this appears to be an activist investor based on purpose
+          const activistKeywords = [
+            'change board', 'management change', 'strategic alternatives',
+            'strategic review', 'sell the company', 'merger', 'acquisition',
+            'activist', 'proxy contest', 'board seat', 'director nomination'
+          ];
+          
+          parsedData.isActivist = this.hasKeywords(parsedData.purpose, activistKeywords);
+        }
       }
       
       return {
