@@ -79,13 +79,13 @@ export function withAuth(
       // Get auth token from cookies or headers
       const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
-      if (!token && options.requireAuth) {
-        return res.status(401).json({ message: 'Authentication required' });
-      }
-
-      if (!token && !options.requireAuth) {
-        // Public route, continue without user context
-        return handler(req as AuthenticatedRequest, res);
+      if (!token) {
+        if (options.requireAuth) {
+          return res.status(401).json({ message: 'Authentication required' });
+        } else {
+          // Public route, continue without user context
+          return handler(req as AuthenticatedRequest, res);
+        }
       }
 
       const jwtSecret = process.env.JWT_SECRET;
@@ -95,17 +95,16 @@ export function withAuth(
       }
 
       try {
-        // Verify token - Fix the type issue by using a more precise approach
-        const decoded = verify(token, jwtSecret);
-        // Ensure decoded has the correct structure
-        const decodedPayload = typeof decoded === 'object' ? decoded as JwtPayload : {} as JwtPayload;
+        // Verify token and handle type safety properly
+        const decoded = verify(token, jwtSecret) as JwtPayload;
         
-        if (!decodedPayload || typeof decodedPayload.id !== 'string') {
+        // Check if the decoded token has the expected id field
+        if (!decoded || typeof decoded.id !== 'string') {
           throw new Error('Invalid token payload');
         }
         
         const user = await prisma.user.findUnique({
-          where: { id: decodedPayload.id },
+          where: { id: decoded.id },
           select: { id: true, email: true, role: true },
         });
 
