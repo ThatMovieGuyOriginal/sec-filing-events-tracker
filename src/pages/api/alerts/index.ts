@@ -1,12 +1,12 @@
 // src/pages/api/alerts/index.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../../../lib/database';
-import { withAuth } from '../../../lib/middleware/auth';
+import { withAuth, AuthenticatedRequest } from '../../../lib/middleware/auth';
 
 /**
  * API endpoint for managing alerts
  */
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedRequest, res: NextApiResponse) {
   const userId = req.user?.id;
 
   switch (req.method) {
