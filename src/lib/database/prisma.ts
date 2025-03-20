@@ -49,4 +49,5 @@ prisma.$use(
   }
 );
 
-export default prisma;
+// Export the Prisma instance
+export { prisma };
