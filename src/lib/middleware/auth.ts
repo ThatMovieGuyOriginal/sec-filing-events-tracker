@@ -1,7 +1,7 @@
 // src/lib/middleware/auth.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../database';
-import { verify } from 'jsonwebtoken';
+import { verify, JwtPayload } from 'jsonwebtoken';
 import { csrf } from '../utils/csrf';
 import logger from '../utils/logger';
 
@@ -95,10 +95,17 @@ export function withAuth(
       }
 
       try {
-        // Verify token
-        const decoded = verify(token, jwtSecret) as { id: string };
+        // Verify token - Fix the type issue by using a more precise approach
+        const decoded = verify(token, jwtSecret);
+        // Ensure decoded has the correct structure
+        const decodedPayload = typeof decoded === 'object' ? decoded as JwtPayload : {} as JwtPayload;
+        
+        if (!decodedPayload || typeof decodedPayload.id !== 'string') {
+          throw new Error('Invalid token payload');
+        }
+        
         const user = await prisma.user.findUnique({
-          where: { id: decoded.id },
+          where: { id: decodedPayload.id },
           select: { id: true, email: true, role: true },
         });
 
@@ -115,7 +122,7 @@ export function withAuth(
         
         // Continue to handler
         return handler(req as AuthenticatedRequest, res);
-      } catch (error) {
+      } catch (error: any) {
         if (error.name === 'JsonWebTokenError') {
           if (options.requireAuth) {
             return res.status(401).json({ message: 'Invalid token' });
@@ -131,7 +138,7 @@ export function withAuth(
         }
         throw error;
       }
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Authentication error:', error);
       if (options.requireAuth) {
         return res.status(401).json({ message: 'Authentication failed' });
