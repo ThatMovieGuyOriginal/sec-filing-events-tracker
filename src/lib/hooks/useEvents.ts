@@ -42,9 +42,15 @@ export function useUpcomingEvents(page = 1, limit = 20, refreshInterval = 300000
  * Hook for fetching company events with SWR
  */
 export function useCompanyEvents(identifier: string) {
+  // Create a type-safe version of the fetcher for this specific endpoint
+  const companyEventsFetcher = async (url: string): Promise<EventData[]> => {
+    const response = await axios.get(url);
+    return response.data;
+  };
+
   const { data, error, isLoading, mutate } = useSWR<EventData[]>(
     identifier ? `/api/companies/${identifier}/events` : null,
-    fetcher,
+    companyEventsFetcher,
     defaultConfig
   );
 
@@ -60,9 +66,15 @@ export function useCompanyEvents(identifier: string) {
  * Hook for fetching events by type with SWR
  */
 export function useEventsByType(type: string, limit: number = 50) {
+  // Create a type-safe version of the fetcher for this specific endpoint
+  const eventsByTypeFetcher = async (url: string): Promise<EventData[]> => {
+    const response = await axios.get(url);
+    return response.data;
+  };
+
   const { data, error, isLoading, mutate } = useSWR<EventData[]>(
     type ? `/api/events/type/${type}?limit=${limit}` : null,
-    fetcher,
+    eventsByTypeFetcher,
     defaultConfig
   );
 
