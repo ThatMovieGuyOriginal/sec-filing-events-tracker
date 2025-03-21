@@ -31,61 +31,86 @@ if (typeof setInterval !== 'undefined') {
   setInterval(cleanupRateLimits, 60000);
 }
 
-interface ExtendedNextApiRequest extends NextApiRequest {
+// Interface for authenticated requests
+interface AuthenticatedRequest extends NextApiRequest {
   user?: {
     id: string;
     subscriptionTier?: string;
   };
 }
 
-type ApiHandler = (req: ExtendedNextApiRequest, res: NextApiResponse) => Promise<void>;
+// Types for handlers
+type ApiHandler = (
+  req: AuthenticatedRequest,
+  res: NextApiResponse
+) => Promise<void> | void;
+
+/**
+ * Log API request/response details
+ */
+const logApiUsage = (
+  req: AuthenticatedRequest,
+  res: NextApiResponse,
+  startTime: number
+): void => {
+  const endTime = Date.now();
+  const duration = endTime - startTime;
+  
+  // Log API request details
+  logger.info(`API ${req.method} ${req.url} - ${res.statusCode} - ${duration}ms`);
+  
+  // Track usage in database (only if user is authenticated)
+  const userId = req.user?.id;
+  if (userId) {
+    try {
+      prisma.apiUsage.create({
+        data: {
+          userId,
+          endpoint: req.url || 'unknown',
+          method: req.method || 'GET',
+          statusCode: res.statusCode,
+          duration,
+          timestamp: new Date(),
+        },
+      }).catch((error: unknown) => {
+        logger.error('Failed to log API usage:', error);
+      });
+    } catch (error: unknown) {
+      logger.error('Error in API monitoring:', error);
+    }
+  }
+};
 
 /**
  * API monitoring middleware
  * Tracks API usage and implements tiered rate limiting
  */
 export function withApiMonitoring(handler: ApiHandler): ApiHandler {
-  return async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
+  return async (req: AuthenticatedRequest, res: NextApiResponse) => {
     const startTime = Date.now();
     
-    // Store the original end methods
+    // Original methods
+    const originalJson = res.json;
+    const originalSend = res.send;
+    const originalStatus = res.status;
     const originalEnd = res.end;
     
-    // Define a custom end method that wraps the original one
-    const customEnd = function(this: any): any {
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-      
-      // Log API request details
-      logger.info(`API ${req.method} ${req.url} - ${res.statusCode} - ${duration}ms`);
-      
-      // Track usage in database (async, don't await)
-      try {
-        const userId = req.user?.id;
-        if (userId) {
-          prisma.apiUsage.create({
-            data: {
-              userId,
-              endpoint: req.url || 'unknown',
-              method: req.method || 'GET',
-              statusCode: res.statusCode,
-              duration,
-              timestamp: new Date(),
-            },
-          }).catch((error: unknown) => {
-            logger.error('Failed to log API usage:', error);
-          });
-        }
-      } catch (error: unknown) {
-        logger.error('Error in API monitoring:', error);
-      }
-      
-      // Call the original end method with the correct context and arguments
-      return originalEnd.apply(this, arguments);
+    // Override status to track the final status code
+    res.status = function(statusCode: number): NextApiResponse {
+      return originalStatus.call(this, statusCode);
     };
     
-    // Override the end method
-    (res as any).end = customEnd;
+    // Override json method
+    res.json = function(body: any): NextApiResponse {
+      logApiUsage(req, res, startTime);
+      return originalJson.call(this, body);
+    };
+    
+    // Override send method
+    res.send = function(body: any): NextApiResponse {
+      logApiUsage(req, res, startTime);
+      return originalSend.call(this, body);
+    };
     
     // Apply rate limiting
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -143,26 +168,10 @@ export function withApiMonitoring(handler: ApiHandler): ApiHandler {
   };
 }
 
-// Export a combined middleware function with auth and monitoring
+/**
+ * Export a combined middleware function with auth and monitoring
+ */
 export function withApiAccess(handler: ApiHandler, options = { requireAuth: true }): ApiHandler {
   const { withAuth } = require('./auth');
   return withAuth(withApiMonitoring(handler), options);
 }
-
-// Interface declaration for ApiUsage model (to be added to schema.prisma)
-/*
-model ApiUsage {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  endpoint    String
-  method      String
-  statusCode  Int
-  duration    Int
-  timestamp   DateTime
-  
-  @@index([userId])
-  @@index([endpoint])
-  @@index([timestamp])
-}
-*/
