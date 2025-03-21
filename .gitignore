@@ -1,81 +1,41 @@
-# Temporarily ignore all files
-*
-*/*
-*/*/*
-*/*/*/*
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
-# Then selectively un-ignore MVP components
+# testing
+/coverage
 
-# Core structure and config files
-!.gitignore
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+.env.*
 !.env.example
-!package.json
-!next.config.js
-!tsconfig.json
-!tailwind.config.js
-!vercel.json
 
-# Core scripts
-!scripts/
-!scripts/fetch-filings.js
+# vercel
+.vercel
 
-# Minimal database functionality
-!src/
-!src/lib/
-!src/lib/database/
-!src/lib/database/index.ts
-!src/lib/database/prisma.ts
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
-# Event extraction (simplified)
-!src/lib/events/
-!src/lib/events/event-extractor.ts
+# logs
+/logs
 
-# Essential parsers
-!src/lib/parsers/
-!src/lib/parsers/base-parser.ts
-!src/lib/parsers/form8k-parser.ts
-!src/lib/parsers/form4-parser.ts
-
-# Core API routes
-!src/pages/
-!src/pages/api/
-!src/pages/api/events/
-!src/pages/api/events/upcoming.ts
-!src/pages/api/companies/
-!src/pages/api/companies/[identifier]/
-!src/pages/api/companies/[identifier]/events.ts
-
-# Auth routes
-!src/pages/api/auth/
-!src/pages/api/auth/login.ts
-!src/pages/api/auth/register.ts
-!src/pages/auth/
-!src/pages/auth/login.tsx
-!src/pages/auth/register.tsx
-
-# Basic middleware
-!src/lib/middleware/
-!src/lib/middleware/auth.ts
-
-# Core UI components
-!src/components/
-!src/components/CalendarView.tsx
-!src/components/EventTable.tsx
-!src/components/Layout.tsx
-!src/components/Sidebar.tsx
-!src/components/EventModal.tsx
-!src/components/ui/
-!src/components/ui/ResponsiveTable.tsx
-
-# Utility functions
-!src/lib/utils/
-!src/lib/utils/logger.ts
-
-# Main pages
-!src/pages/index.tsx
-!src/pages/_app.tsx
-!src/pages/_document.tsx
-
-# Styles
-!src/styles/
-!src/styles/globals.css
+# data directory
+/data
