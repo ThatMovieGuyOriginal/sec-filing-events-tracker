@@ -28,7 +28,9 @@ const cleanupRateLimits = () => {
 };
 
 // Run cleanup periodically
-setInterval(cleanupRateLimits, 60000);
+if (typeof setInterval !== 'undefined') {
+  setInterval(cleanupRateLimits, 60000);
+}
 
 /**
  * API monitoring middleware
@@ -40,7 +42,9 @@ export function withApiMonitoring(handler: Function) {
     
     // Add a response listener to track completed requests
     const originalEnd = res.end;
-    res.end = function (...args) {
+    
+    // Fix for TypeScript overloaded function issue
+    res.end = function(this: any, chunk?: any, encoding?: BufferEncoding, cb?: () => void) {
       const endTime = Date.now();
       const duration = endTime - startTime;
       
@@ -68,8 +72,8 @@ export function withApiMonitoring(handler: Function) {
         logger.error('Error in API monitoring:', error);
       }
       
-      // Call the original end method
-      return originalEnd.apply(res, args);
+      // Call the original end method with the correct context and arguments
+      return originalEnd.apply(this, arguments as any);
     };
     
     // Apply rate limiting
@@ -131,22 +135,3 @@ export function withApiAccess(handler: Function, options = { requireAuth: true }
   const { withAuth } = require('./auth');
   return withAuth(withApiMonitoring(handler), options);
 }
-
-// Prisma model for API usage tracking
-/*
-// Add this to your Prisma schema
-model ApiUsage {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  endpoint    String
-  method      String
-  statusCode  Int
-  duration    Int
-  timestamp   DateTime
-  
-  @@index([userId])
-  @@index([endpoint])
-  @@index([timestamp])
-}
-*/
