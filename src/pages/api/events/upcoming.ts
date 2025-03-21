@@ -36,14 +36,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
+    
+    // Calculate offset based on page and limit
     const offset = (page - 1) * limit;
     
-    // Modified to support pagination
+    // Get events with pagination
     const events = await eventDatabase.getUpcomingEvents(limit, offset);
     const total = await eventDatabase.getUpcomingEventsCount();
     
     return res.status(200).json({
-      events: eventsArray,
+      events: events, // Fixed: Use the events variable directly
       pagination: {
         page,
         limit,
