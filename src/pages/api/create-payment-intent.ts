@@ -12,6 +12,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 type Plan = 'basic' | 'pro' | 'enterprise';
 type BillingInterval = 'monthly' | 'annual';
 
+// Extend NextApiRequest with a user property (provided by withAuth middleware)
+interface AuthenticatedNextApiRequest extends NextApiRequest {
+  user?: {
+    id: string;
+    email?: string;
+    name?: string;
+  };
+}
+
 // Get actual plan prices using union types
 const getPlanPrice = (planId: Plan, billingInterval: BillingInterval): number => {
   const prices: Record<Plan, Record<BillingInterval, number>> = {
@@ -23,7 +32,7 @@ const getPlanPrice = (planId: Plan, billingInterval: BillingInterval): number =>
   return prices[planId][billingInterval] || 0;
 };
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -35,8 +44,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (
     !planId ||
     !billingInterval ||
-    !(['basic', 'pro', 'enterprise'] as string[]).includes(planId) ||
-    !(['monthly', 'annual'] as string[]).includes(billingInterval)
+    !(['basic', 'pro', 'enterprise'] as Plan[]).includes(planId) ||
+    !(['monthly', 'annual'] as BillingInterval[]).includes(billingInterval)
   ) {
     return res.status(400).json({ message: 'Invalid plan ID or billing interval' });
   }
