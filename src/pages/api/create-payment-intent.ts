@@ -2,22 +2,25 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { withAuth } from '../../lib/middleware/auth';
 import { prisma } from '../../lib/database';
-// Need to install: npm install stripe
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-08-16', // Use the compatible API version
 });
 
-// Get actual plan prices
-const getPlanPrice = (planId: string, billingInterval: string): number => {
-  const prices = {
+// Define union types for valid plan IDs and billing intervals
+type Plan = 'basic' | 'pro' | 'enterprise';
+type BillingInterval = 'monthly' | 'annual';
+
+// Get actual plan prices using union types
+const getPlanPrice = (planId: Plan, billingInterval: BillingInterval): number => {
+  const prices: Record<Plan, Record<BillingInterval, number>> = {
     basic: { monthly: 19, annual: 199 },
     pro: { monthly: 49, annual: 499 },
     enterprise: { monthly: 149, annual: 1490 },
   };
 
-  return prices[planId]?.[billingInterval] || 0;
+  return prices[planId][billingInterval] || 0;
 };
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -28,8 +31,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { planId, billingInterval } = req.body;
   const userId = req.user?.id;
 
-  if (!planId || !billingInterval) {
-    return res.status(400).json({ message: 'Plan ID and billing interval are required' });
+  // Validate that planId and billingInterval are among the allowed values
+  if (
+    !planId ||
+    !billingInterval ||
+    !(['basic', 'pro', 'enterprise'] as string[]).includes(planId) ||
+    !(['monthly', 'annual'] as string[]).includes(billingInterval)
+  ) {
+    return res.status(400).json({ message: 'Invalid plan ID or billing interval' });
   }
 
   try {
@@ -64,7 +73,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     // Calculate the price based on plan and billing interval
-    const price = getPlanPrice(planId, billingInterval);
+    const price = getPlanPrice(planId as Plan, billingInterval as BillingInterval);
 
     // Create a payment intent
     const paymentIntent = await stripe.paymentIntents.create({
