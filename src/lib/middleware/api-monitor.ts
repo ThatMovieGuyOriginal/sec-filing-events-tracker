@@ -103,13 +103,15 @@ export function withApiMonitoring(handler: ApiHandler): ApiHandler {
     // Override json method
     res.json = function(body: any): NextApiResponse {
       logApiUsage(req, res, startTime);
-      return originalJson.call(this, body);
+      originalJson.call(this, body);
+      return this;
     };
     
     // Override send method
     res.send = function(body: any): NextApiResponse {
       logApiUsage(req, res, startTime);
-      return originalSend.call(this, body);
+      originalSend.call(this, body);
+      return this;
     };
     
     // Apply rate limiting
