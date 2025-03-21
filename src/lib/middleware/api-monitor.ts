@@ -4,7 +4,7 @@ import { prisma } from '../database';
 import logger from '../utils/logger';
 
 // Rate limit configuration per tier
-const RATE_LIMITS = {
+const RATE_LIMITS: Record<string, { window: number; max: number }> = {
   'free': { window: 60 * 1000, max: 60 }, // 60 requests per minute
   'basic': { window: 60 * 1000, max: 120 }, // 120 requests per minute
   'pro': { window: 60 * 1000, max: 300 }, // 300 requests per minute
@@ -12,8 +12,7 @@ const RATE_LIMITS = {
 };
 
 // In-memory store for rate limiting
-// In production, consider using Redis or similar for distributed environments
-const rateLimitStore = new Map();
+const rateLimitStore = new Map<string, { windowStart: number; requestCount: number; window: number }>();
 
 /**
  * Clean up expired rate limit entries
@@ -27,24 +26,26 @@ const cleanupRateLimits = () => {
   }
 };
 
-// Run cleanup periodically
+// Run cleanup periodically - only in environments with setInterval
 if (typeof setInterval !== 'undefined') {
   setInterval(cleanupRateLimits, 60000);
 }
+
+type ApiHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
 
 /**
  * API monitoring middleware
  * Tracks API usage and implements tiered rate limiting
  */
-export function withApiMonitoring(handler: Function) {
+export function withApiMonitoring(handler: ApiHandler): ApiHandler {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const startTime = Date.now();
     
-    // Add a response listener to track completed requests
+    // Store the original end methods
     const originalEnd = res.end;
     
-    // Fix for TypeScript overloaded function issue
-    res.end = function(this: any, chunk?: any, encoding?: BufferEncoding, cb?: () => void) {
+    // Define a custom end method that wraps the original one
+    const customEnd = function(this: any) {
       const endTime = Date.now();
       const duration = endTime - startTime;
       
@@ -73,8 +74,11 @@ export function withApiMonitoring(handler: Function) {
       }
       
       // Call the original end method with the correct context and arguments
-      return originalEnd.apply(this, arguments as any);
+      return originalEnd.apply(this, arguments);
     };
+    
+    // Override the end method
+    (res as any).end = customEnd;
     
     // Apply rate limiting
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -83,7 +87,7 @@ export function withApiMonitoring(handler: Function) {
     const rateLimit = RATE_LIMITS[userTier] || RATE_LIMITS.free;
     
     // Create a unique key for this user/IP
-    const key = userId ? `user-${userId}` : `ip-${ip}`;
+    const key = userId ? `user-${userId}` : `ip-${String(ip)}`;
     
     const now = Date.now();
     const rateLimitData = rateLimitStore.get(key);
@@ -121,9 +125,11 @@ export function withApiMonitoring(handler: Function) {
     
     // Set rate limit headers
     const currentLimit = rateLimitStore.get(key);
-    res.setHeader('X-RateLimit-Limit', rateLimit.max);
-    res.setHeader('X-RateLimit-Remaining', Math.max(0, rateLimit.max - currentLimit.requestCount));
-    res.setHeader('X-RateLimit-Reset', Math.ceil((currentLimit.windowStart + rateLimit.window) / 1000));
+    if (currentLimit) {
+      res.setHeader('X-RateLimit-Limit', rateLimit.max);
+      res.setHeader('X-RateLimit-Remaining', Math.max(0, rateLimit.max - currentLimit.requestCount));
+      res.setHeader('X-RateLimit-Reset', Math.ceil((currentLimit.windowStart + rateLimit.window) / 1000));
+    }
     
     // Continue to handler
     return handler(req, res);
@@ -131,7 +137,7 @@ export function withApiMonitoring(handler: Function) {
 }
 
 // Export a combined middleware function with auth and monitoring
-export function withApiAccess(handler: Function, options = { requireAuth: true }) {
+export function withApiAccess(handler: ApiHandler, options = { requireAuth: true }) {
   const { withAuth } = require('./auth');
   return withAuth(withApiMonitoring(handler), options);
 }
