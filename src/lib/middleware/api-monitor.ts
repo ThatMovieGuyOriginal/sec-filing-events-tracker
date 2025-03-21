@@ -17,7 +17,7 @@ const rateLimitStore = new Map<string, { windowStart: number; requestCount: numb
 /**
  * Clean up expired rate limit entries
  */
-const cleanupRateLimits = () => {
+const cleanupRateLimits = (): void => {
   const now = Date.now();
   for (const [key, data] of rateLimitStore.entries()) {
     if (now - data.windowStart > data.window) {
@@ -31,21 +31,28 @@ if (typeof setInterval !== 'undefined') {
   setInterval(cleanupRateLimits, 60000);
 }
 
-type ApiHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
+interface ExtendedNextApiRequest extends NextApiRequest {
+  user?: {
+    id: string;
+    subscriptionTier?: string;
+  };
+}
+
+type ApiHandler = (req: ExtendedNextApiRequest, res: NextApiResponse) => Promise<void>;
 
 /**
  * API monitoring middleware
  * Tracks API usage and implements tiered rate limiting
  */
 export function withApiMonitoring(handler: ApiHandler): ApiHandler {
-  return async (req: NextApiRequest, res: NextApiResponse) => {
+  return async (req: ExtendedNextApiRequest, res: NextApiResponse) => {
     const startTime = Date.now();
     
     // Store the original end methods
     const originalEnd = res.end;
     
     // Define a custom end method that wraps the original one
-    const customEnd = function(this: any) {
+    const customEnd = function(this: any): any {
       const endTime = Date.now();
       const duration = endTime - startTime;
       
@@ -54,7 +61,7 @@ export function withApiMonitoring(handler: ApiHandler): ApiHandler {
       
       // Track usage in database (async, don't await)
       try {
-        const userId = (req as any).user?.id;
+        const userId = req.user?.id;
         if (userId) {
           prisma.apiUsage.create({
             data: {
@@ -65,11 +72,11 @@ export function withApiMonitoring(handler: ApiHandler): ApiHandler {
               duration,
               timestamp: new Date(),
             },
-          }).catch(error => {
+          }).catch((error: unknown) => {
             logger.error('Failed to log API usage:', error);
           });
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('Error in API monitoring:', error);
       }
       
@@ -82,8 +89,8 @@ export function withApiMonitoring(handler: ApiHandler): ApiHandler {
     
     // Apply rate limiting
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const userId = (req as any).user?.id;
-    const userTier = (req as any).user?.subscriptionTier || 'free';
+    const userId = req.user?.id;
+    const userTier = req.user?.subscriptionTier || 'free';
     const rateLimit = RATE_LIMITS[userTier] || RATE_LIMITS.free;
     
     // Create a unique key for this user/IP
@@ -137,7 +144,25 @@ export function withApiMonitoring(handler: ApiHandler): ApiHandler {
 }
 
 // Export a combined middleware function with auth and monitoring
-export function withApiAccess(handler: ApiHandler, options = { requireAuth: true }) {
+export function withApiAccess(handler: ApiHandler, options = { requireAuth: true }): ApiHandler {
   const { withAuth } = require('./auth');
   return withAuth(withApiMonitoring(handler), options);
 }
+
+// Interface declaration for ApiUsage model (to be added to schema.prisma)
+/*
+model ApiUsage {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  endpoint    String
+  method      String
+  statusCode  Int
+  duration    Int
+  timestamp   DateTime
+  
+  @@index([userId])
+  @@index([endpoint])
+  @@index([timestamp])
+}
+*/
