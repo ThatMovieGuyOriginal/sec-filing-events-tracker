@@ -40,6 +40,11 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   const { planId, billingInterval } = req.body;
   const userId = req.user?.id;
 
+  // Check for an authenticated user; userId must be defined.
+  if (!userId) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
   // Validate that planId and billingInterval are among the allowed values
   if (
     !planId ||
