@@ -40,8 +40,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Calculate offset based on page and limit
     const offset = (page - 1) * limit;
     
-    // Get events with pagination
-    const events = await eventDatabase.getUpcomingEvents(limit, offset);
+    // Get events with pagination (pass a single options object)
+    const events = await eventDatabase.getUpcomingEvents({ limit, offset });
     const total = await eventDatabase.getUpcomingEventsCount();
     
     return res.status(200).json({
