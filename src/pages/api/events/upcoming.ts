@@ -1,11 +1,11 @@
 // src/pages/api/events/upcoming.ts
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 import { eventDatabase } from '../../../lib/database';
 import { withAuth } from '../../../lib/middleware/auth';
 import logger from '../../../lib/utils/logger';
 
 // CORS headers middleware
-const allowCors = (handler) => async (req: NextApiRequest, res: NextApiResponse) => {
+const allowCors = (handler: NextApiHandler) => async (req: NextApiRequest, res: NextApiResponse) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -45,7 +45,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const total = await eventDatabase.getUpcomingEventsCount();
     
     return res.status(200).json({
-      events: events, // Fixed: Use the events variable directly
+      events,
       pagination: {
         page,
         limit,
